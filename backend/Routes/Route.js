@@ -81,10 +81,9 @@ Routes.post("/Login", async (request, response) => {
 
 Routes.post("/Fatch_User_Details", Token_Verification, async (request, response) => {
     try {
-        console.log(request.User)
-        const Payload = { id: request.User._id }
+        const Payload = { id: request.user._id }
         const User_Token = jwt.sign(Payload, process.env.JWT_SECURITY_KEY)
-        return Resopnse_Handler(response, 202, "User is Valid.", { role: request.User.role, User_Token })
+        return Resopnse_Handler(response, 202, "User is Valid.", { role: request.user.role, User_Token })
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
