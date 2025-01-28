@@ -73,7 +73,19 @@ Routes.post("/Login", async (request, response) => {
 
         const User_Token = jwt.sign(Payload, process.env.JWT_SECURITY_KEY)
 
-        return Resopnse_Handler(response, 201, "Login Successfully", User_Token)
+        return Resopnse_Handler(response, 201, "Login Successfully", { User_Token, role: User_Account_ACK.role })
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error")
+    }
+})
+
+Routes.post("/Fatch_User_Details", Token_Verification, async (request, response) => {
+    try {
+        console.log(request.User)
+        const Payload = { id: request.User._id }
+        const User_Token = jwt.sign(Payload, process.env.JWT_SECURITY_KEY)
+        return Resopnse_Handler(response, 202, "User is Valid.", { role: request.User.role, User_Token })
+
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
     }
@@ -111,7 +123,7 @@ Routes.post("/Disabler", async (request, response) => {
     }
 })
 
-Routes.post("/Add_Product",Token_Verification, async (request, response) => {
+Routes.post("/Add_Product", Token_Verification, async (request, response) => {
     try {
         const { name, model, description, company, price, rate, tax, discount, stock, userid } = request.body
 
@@ -129,9 +141,9 @@ Routes.post("/Add_Product",Token_Verification, async (request, response) => {
     }
 })
 
-Routes.get("/Get_Products",Token_Verification, async (request, response) => {
+Routes.get("/Get_Products", Token_Verification, async (request, response) => {
     try {
-        const All_Products = await Product.find({ userid:request.user._id })
+        const All_Products = await Product.find({ userid: request.user._id })
 
         if (All_Products.length === 0) return resp.status(404).json({ message: "Your product list is empty" });
 
@@ -142,7 +154,7 @@ Routes.get("/Get_Products",Token_Verification, async (request, response) => {
     }
 })
 
-Routes.delete("/Delete_Product/:id",Token_Verification, async (request, response) => {
+Routes.delete("/Delete_Product/:id", Token_Verification, async (request, response) => {
     try {
         const { id } = request.params;
         if (!id) return response.status(404).json({ Message: "Please select the product" });
@@ -151,7 +163,7 @@ Routes.delete("/Delete_Product/:id",Token_Verification, async (request, response
 
         if (!Existing_Product) return response.status(404).json({ Message: "This product is not found in the product list." });
 
-        const Delete_Product_ACK = await Product.deleteOne({ _id: id, userid: request.user._id});
+        const Delete_Product_ACK = await Product.deleteOne({ _id: id, userid: request.user._id });
 
         return response.status(202).json({ Message: "Product deleted successfully", Delete_Product_ACK });
 
@@ -160,7 +172,7 @@ Routes.delete("/Delete_Product/:id",Token_Verification, async (request, response
     }
 })
 
-Routes.put("/Update_Product/:id",Token_Verification, async (request, response) => {
+Routes.put("/Update_Product/:id", Token_Verification, async (request, response) => {
     try {
         const {
             name, company, model, stock, description, price, discount, rate, tax, } = req.body;
@@ -193,7 +205,7 @@ Routes.put("/Update_Product/:id",Token_Verification, async (request, response) =
 
 //     const User_Data = await User.findOne({ _id: User_Payload.id }).select("-password -_id -__v -service -createdAt")
 //     if(!User_Data) return Resopnse_Handler(response,400,"User not Found.")
-    
+
 //     return Resopnse_Handler(response,201,"User Validation Successfull.",User_Data)
 // })
 
