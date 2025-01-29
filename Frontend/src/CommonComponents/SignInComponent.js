@@ -11,27 +11,35 @@ const SignInComponent = () => {
     const set = (e) => set_login_input_data({ ...login_input_data, [e.target.name]: e.target.value })
 
     useEffect(() => {
-        const User_Data = JSON.parse(localStorage.getItem("User_Data"))
-        console.log(User_Data.Remember_me_boolen_state)
-        if (User_Data && User_Data.Remember_me_boolen_state) return Fatch_User_Details(User_Data.Authorization_Token)
+        const Fatch_User_Details_Helper = async () => {
+            const User_Data = JSON.parse(localStorage.getItem("User_Data"))
+            if (User_Data && User_Data.Remember_me_boolen_state) return await Fatch_User_Details(User_Data.Authorization_Token)
+        }
+        Fatch_User_Details_Helper()
     }, [])
 
     const Fatch_User_Details = async (token) => {
-        const User_Ckeck_ACK = await fetch("http://localhost:3100/Api/Fatch_User_Details", {
-            method: "post",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token
+        try {
+            const User_Ckeck_ACK = await fetch("http://localhost:3100/Api/Fatch_User_Details", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": token
+                }
+            })
+            const User_Ckeck_ACK_JSON = await User_Ckeck_ACK.json()
+            // alert(User_Ckeck_ACK_JSON?.Message)
+            if (User_Ckeck_ACK.status === 202) {
+                localStorage.clear()
+                console.log(User_Ckeck_ACK_JSON.Data.User_Token)
+                localStorage.setItem("User_Data", JSON.stringify({ "Authorization_Token": User_Ckeck_ACK_JSON.Data.User_Token, "Remember_me_boolen_state": true }))
+                window.history.replaceState(null, null, "/")
+                navigate("/" + User_Ckeck_ACK_JSON?.Data?.role, { replace: true })
+            } else {
+                localStorage.clear()
             }
-        })
-
-        const User_Ckeck_ACK_JSON = await User_Ckeck_ACK.json()
-        alert(User_Ckeck_ACK_JSON?.Message)
-        if (User_Ckeck_ACK.status === 202) {
-            localStorage.clear()
-            console.log(User_Ckeck_ACK_JSON.Data.User_Token)
-            localStorage.setItem("User_Data", JSON.stringify({ "Authorization_Token": User_Ckeck_ACK_JSON.Data.User_Token, "Remember_me_boolen_state": true }))
-            navigate("/" + User_Ckeck_ACK_JSON.Data.role)
+        } catch (error) {
+            console.log(error)
         }
     }
     const login = async (e) => {

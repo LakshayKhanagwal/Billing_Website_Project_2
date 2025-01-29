@@ -3,7 +3,7 @@ import SignInComponent from '../CommonComponents/SignInComponent'
 
 const SignIn = () => {
   return (
-    <div>
+    <div >
       <SignInComponent/>
     </div>
   )
