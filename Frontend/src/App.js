@@ -1,6 +1,6 @@
 import React from 'react'
 import SignIn from './CommonPages/SignIn'
-import {BrowserRouter,Routes,Route,Navigate} from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import SuperAdminDashboard from './Superadmin/Pages/SuperAdminDashboard'
 import Invoice from './Shopkeeper/Pages/Invoice'
 import UploadExcel from './Shopkeeper/Pages/UploadExcel'
@@ -22,28 +22,28 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           {/* superadmin */}
-          <Route path='/SuperAdminDashboard' element={<SuperAdminDashboard/>}></Route>
-          <Route path='/Superadmin' element={<Navigate to="/SuperAdminDashboard" replace/>}></Route>
+          <Route path='/SuperAdminDashboard' element={<SuperAdminDashboard />}></Route>
+          <Route path='/Superadmin' element={<Navigate to="/SuperAdminDashboard" replace />}></Route>
           {/* shopkeeper */}
-          <Route path='/Shopkeeper' element={<Navigate to="/Dashboard" replace/>}></Route>
-          <Route path='/Dashboard' element={<Dashboard/>}></Route>
-          <Route path='/Invoice' element={<Invoice/>}></Route>
-          <Route path='/Customers' element={<Customers/>}></Route>
-          <Route path='/TransactionList' element={<TransactionList/>}></Route>
-          <Route path='/AddTransaction' element={<AddTransaction/>}></Route>
-          <Route path='/UploadExcel' element={<UploadExcel/>}></Route>
-          <Route path='/AllProducts' element={<AllProducts/>}></Route>
-          <Route path='/UserDetails' element={<UserDetails/>}></Route>
-          <Route path='/ManageExecutive' element={<Executive/>}></Route>
+          <Route path='/Shopkeeper' element={<Navigate to="/Dashboard" replace />}></Route>
+          <Route path='/Dashboard' element={<Dashboard />}></Route>
+          <Route path='/Invoice' element={<Invoice />}></Route>
+          <Route path='/Customers' element={<Customers />}></Route>
+          <Route path='/TransactionList' element={<TransactionList />}></Route>
+          <Route path='/AddTransaction' element={<AddTransaction />}></Route>
+          <Route path='/UploadExcel' element={<UploadExcel />}></Route>
+          <Route path='/AllProducts' element={<AllProducts />}></Route>
+          <Route path='/UserDetails' element={<UserDetails />}></Route>
+          <Route path='/ManageExecutive' element={<Executive />}></Route>
           {/* login page */}
-          <Route path='/' element={<SignIn/>}/>
+          <Route path='/' element={<SignIn />} />
           {/* executive */}
-          <Route path='/Executive' element={<Navigate to="/ExecutiveInvoices" replace/>}></Route>
-          <Route path='/ExecutiveInvoices' element={<ExecutiveInvoices/>}></Route>
-          <Route path='/ExecutiveProducts' element={<ExecutiveProducts/>}></Route>
-          <Route path='/ExecutiveCustomers' element={<ExecutiveCustomers/>}></Route>
-          <Route path='/ExecutiveTransactionlist' element={<ExecutiveTransactionList/>}></Route>
-          <Route path='/ExecutiveAddTransaction' element={<ExecutiveAddTransaction/>}></Route>
+          <Route path='/Executive' element={<Navigate to="/ExecutiveInvoices" replace />}></Route>
+          <Route path='/ExecutiveInvoices' element={<ExecutiveInvoices />}></Route>
+          <Route path='/ExecutiveProducts' element={<ExecutiveProducts />}></Route>
+          <Route path='/ExecutiveCustomers' element={<ExecutiveCustomers />}></Route>
+          <Route path='/ExecutiveTransactionlist' element={<ExecutiveTransactionList />}></Route>
+          <Route path='/ExecutiveAddTransaction' element={<ExecutiveAddTransaction />}></Route>
         </Routes>
       </BrowserRouter>
     </div>
