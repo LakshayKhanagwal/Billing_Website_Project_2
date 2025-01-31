@@ -2,7 +2,8 @@ import React from 'react'
 import Footer from '../../CommonComponents/Footer'
 import Title from '../../CommonComponents/Title'
 
-const ReviewExcelData = () => {
+const ReviewExcelData = ({Product_Excel}) => {
+    console.log(Product_Excel)
   return (
     <div className="main-content">
         <div className="page-content">
