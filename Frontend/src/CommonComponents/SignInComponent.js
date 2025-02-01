@@ -42,6 +42,7 @@ const SignInComponent = () => {
             console.log(error)
         }
     }
+    
     const login = async (e) => {
         try {
             e.preventDefault()

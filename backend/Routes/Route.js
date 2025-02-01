@@ -90,7 +90,20 @@ Routes.post("/Fatch_User_Details", Token_Verification, async (request, response)
     }
 })
 
-Routes.post("/Enabler", async (request, response) => {
+Routes.post("/Fatch_Shopkeepers_Executives", Token_Verification, async (request, response) => {
+    try {
+        const Shopkeepers_Executives = await User.find({ role: { $ne: 'Superadmin' } }).select('-password')
+
+        if (Shopkeepers_Executives.length === 0) return Resopnse_Handler(response, 200, "No User Found.")
+
+        Resopnse_Handler(response, 202, "Users Fetched Successfully.", Shopkeepers_Executives)
+
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error")
+    }
+})
+
+Routes.put("/Enabler", async (request, response) => {
     try {
         const { id } = request.body
 
@@ -106,10 +119,10 @@ Routes.post("/Enabler", async (request, response) => {
     }
 })
 
-Routes.post("/Disabler", async (request, response) => {
+Routes.put("/Disabler", async (request, response) => {
     try {
         const { id } = request.body
-
+        console.log(id)
         if (!id) return response.status(404).json({ Message: "Please Select The User." })
 
         const User_Account_Details = await User.findOne({ _id: id })
