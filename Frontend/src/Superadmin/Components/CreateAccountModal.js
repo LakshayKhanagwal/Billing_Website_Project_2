@@ -1,6 +1,7 @@
 import React from 'react'
 
 const CreateAccountModal = (props) => {
+    console.log(props)
     return (
     <div>
         <div className="modal fade show" style={{display:"block"}} id="addtaxModal" tabIndex={-1} aria-hidden="true">

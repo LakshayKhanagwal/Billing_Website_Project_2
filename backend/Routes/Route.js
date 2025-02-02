@@ -90,7 +90,7 @@ Routes.post("/Fatch_User_Details", Token_Verification, async (request, response)
     }
 })
 
-Routes.post("/Fatch_Shopkeepers_Executives", Token_Verification, async (request, response) => {
+Routes.get("/Fatch_Shopkeepers_Executives", Token_Verification, async (request, response) => {
     try {
         const Shopkeepers_Executives = await User.find({ role: { $ne: 'Superadmin' } }).select('-password')
 
@@ -103,7 +103,7 @@ Routes.post("/Fatch_Shopkeepers_Executives", Token_Verification, async (request,
     }
 })
 
-Routes.put("/Enabler", async (request, response) => {
+Routes.put("/Enabler", Token_Verification, async (request, response) => {
     try {
         const { id } = request.body
 
@@ -119,10 +119,10 @@ Routes.put("/Enabler", async (request, response) => {
     }
 })
 
-Routes.put("/Disabler", async (request, response) => {
+Routes.put("/Disabler", Token_Verification, async (request, response) => {
     try {
         const { id } = request.body
-        console.log(id)
+
         if (!id) return response.status(404).json({ Message: "Please Select The User." })
 
         const User_Account_Details = await User.findOne({ _id: id })

@@ -1,8 +1,16 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const SuperAdminHeader = () => {
 const[Toggle,setToggle]=useState(false)
+const nevigate = useNavigate()
+
+const Logout = () => {
+    localStorage.clear()
+    window.history.replaceState(null, null, "/")
+    nevigate("/")
+}
+
   return (
     <div className={Toggle?"menu":""}>
         <div id="layout-wrapper">
@@ -44,7 +52,7 @@ const[Toggle,setToggle]=useState(false)
                                         </span>
                                     </button>
                                     <div className="dropdown-menu dropdown-menu-end">
-                                        <Link className="dropdown-item text-danger" to={'/'}><i className="bx bx-power-off fs-15 align-middle me-1 text-danger" /> <span key="t-logout">Logout</span></Link>
+                                        <span className="dropdown-item text-danger Cursor_hover" onClick={Logout}><i className="bx bx-power-off fs-15 align-middle me-1 text-danger" /> <span key="t-logout">Logout</span></span>
                                     </div>
                                 </div>
                         </div>

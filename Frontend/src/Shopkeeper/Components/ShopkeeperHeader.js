@@ -9,7 +9,6 @@ const ShopkeeperHeader = () => {
         localStorage.clear()
         window.history.replaceState(null, null, "/")
         nevigate("/")
-        console.log("first")
     }
     return (
         <div className={Toggle ? "menu" : ""}>

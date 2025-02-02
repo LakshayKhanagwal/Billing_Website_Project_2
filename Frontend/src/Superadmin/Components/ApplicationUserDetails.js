@@ -6,6 +6,12 @@ import { useNavigate } from 'react-router-dom'
 
 const ApplicationUserDetails = () => {
     const [Toggle, setToggle] = useState(false)
+    const [Current_Page, Set_Current_Page] = useState(1)
+    const [Total_Pages, Set_Total_Pages] = useState(0)
+    const [Users_Divided, Set_Users_Divided] = useState(0)
+    const [User_Count, Set_User_Count] = useState({})
+    const Users_Per_Page = 3
+
     const navigate = useNavigate()
     const [Shopkeepers_Executives, Set_Shopkeepers_Executives] = useState([])
 
@@ -17,20 +23,56 @@ const ApplicationUserDetails = () => {
         Fatch_Users_Helper()
     }, [])
 
+    useEffect(() => {
+        if (Shopkeepers_Executives.length !== 0) {
+            const Last_User_Index = Current_Page * Users_Per_Page
+            const First_User_Index = Last_User_Index - Users_Per_Page
+            const Current_VIsible_Users = Shopkeepers_Executives.slice(First_User_Index, Last_User_Index)
+            const Total_Page_Count = Math.ceil(Shopkeepers_Executives.length / Users_Per_Page)
+
+            Set_User_Count({ First_Index: First_User_Index + 1, Last_Index: Current_VIsible_Users.length + First_User_Index, Total_Users: Shopkeepers_Executives.length })
+            Set_Total_Pages(Total_Page_Count)
+            Set_Users_Divided(Current_VIsible_Users)
+        }
+    }, [Shopkeepers_Executives, Current_Page])
+
     const Fatch_Users = async (token) => {
         try {
             const Users = await fetch("http://localhost:3100/Api/Fatch_Shopkeepers_Executives", {
-                method: "post",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": token
                 }
             })
             const Users_All = await Users.json()
+            if (Users.status === 202) return Set_Shopkeepers_Executives(Users_All.Data)
             alert(Users_All?.Message)
-            if (Users.status === 202) {
-                return Set_Shopkeepers_Executives(Users_All.Data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const Mark_Enable = async (id) => {
+        try {
+            const User_Data = JSON.parse(localStorage.getItem("User_Data"))
+            if (!User_Data || !User_Data.Authorization_Token) {
+                localStorage.clear();
+                alert("Unauthorised user")
+                window.history.replaceState(null, null, "/")
+                return navigate("/", { replace: true })
             }
+
+            const Users = await fetch("http://localhost:3100/Api/Enabler", {
+                method: "put",
+                body: JSON.stringify({ id }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": User_Data.Authorization_Token
+                }
+            })
+            const Users_Disable_ACK = await Users.json()
+            if (Users.status === 202) return Fatch_Users(User_Data.Authorization_Token)
+            alert(Users_Disable_ACK?.Message)
         } catch (error) {
             console.log(error)
         }
@@ -45,18 +87,18 @@ const ApplicationUserDetails = () => {
                 window.history.replaceState(null, null, "/")
                 return navigate("/", { replace: true })
             }
+
             const Users = await fetch("http://localhost:3100/Api/Disabler", {
                 method: "put",
-                body: id,
+                body: JSON.stringify({ id }),
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": User_Data.Authorization_Token
                 }
             })
             const Users_Disable_ACK = await Users.json()
-            console.log(Users_Disable_ACK)
-            alert(Users_Disable_ACK?.Message)
             if (Users.status === 202) return Fatch_Users(User_Data.Authorization_Token)
+            alert(Users_Disable_ACK?.Message)
         } catch (error) {
             console.log(error)
         }
@@ -67,10 +109,10 @@ const ApplicationUserDetails = () => {
             <div className="main-content">
                 <div className="page-content">
                     <div className="container-fluid">
-                        <Title Name={"Taxes"} />
+                        <Title Name={"Users"} />
                         <div className="row pb-4 gy-3">
                             <div className="col-sm-4">
-                                <button onClick={() => setToggle(true)} className="btn btn-primary addtax-modal" ><i className="las la-plus me-1" /> Add Taxes</button>
+                                <button onClick={() => setToggle(true)} className="btn btn-primary addtax-modal" ><i className="las la-plus me-1" /> Add User</button>
                             </div>
                             <div className="col-sm-auto ms-auto">
                                 <div className="d-flex gap-3">
@@ -109,7 +151,7 @@ const ApplicationUserDetails = () => {
                                                 </thead>
                                                 <tbody>
                                                     {
-                                                        Shopkeepers_Executives && Shopkeepers_Executives.length !== 0 ? Shopkeepers_Executives.map((user, index) => {
+                                                        Users_Divided && Users_Divided.length !== 0 ? Users_Divided.map((user, index) => {
                                                             return (
                                                                 <tr key={index}>
                                                                     <td>{user.name}</td>
@@ -124,7 +166,7 @@ const ApplicationUserDetails = () => {
                                                                             <label className="form-check-label" htmlFor="switch1" />
                                                                         </div>
                                                                             : <div className="form-check form-switch">
-                                                                                <input className="form-check-input" type="checkbox" checked={false} onChange={() => Mark_Disable(user._id)} role="switch" id="switch1" />
+                                                                                <input className="form-check-input" type="checkbox" checked={false} onChange={() => Mark_Enable(user._id)} role="switch" id="switch1" />
                                                                                 <label className="form-check-label" htmlFor="switch1" />
                                                                             </div>
                                                                         }
@@ -133,20 +175,6 @@ const ApplicationUserDetails = () => {
                                                             )
                                                         }) : <tr><td colSpan={7}>No User Found.</td></tr>
                                                     }
-                                                    {/* <tr>
-                                                        <td>Sales Tax</td>
-                                                        <td>United States</td>
-                                                        <td>(any)</td>
-                                                        <td>10%</td>
-                                                        <td>10%</td>
-                                                        <td><span className="badge bg-success-subtle text-success  p-2">Enabled</span></td>
-                                                        <td>
-                                                            <div className="form-check form-switch">
-                                                                <input className="form-check-input" type="checkbox" role="switch" id="switch1" />
-                                                                <label className="form-check-label" htmlFor="switch1" />
-                                                            </div>
-                                                        </td>
-                                                    </tr> */}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -154,21 +182,22 @@ const ApplicationUserDetails = () => {
                                 </div>
                                 <div className="row align-items-center mb-2 gy-3">
                                     <div className="col-md-5">
-                                        <p className="mb-0 text-muted">Showing <b>1</b> to <b>5</b> of <b>10</b> results</p>
+                                        <p className="mb-0 text-muted">Showing <b>{User_Count?.First_Index}</b> to <b>{User_Count?.Last_Index}</b> of <b>{User_Count?.Total_Users}</b> results</p>
                                     </div>
                                     <div className="col-sm-auto ms-auto">
                                         <nav aria-label="...">
                                             <ul className="pagination mb-0">
-                                                <li className="page-item disabled">
-                                                    <span className="page-link">Previous</span>
+                                                <li className={Current_Page === 1 ? "page-item disabled" : "page-item"}>
+                                                    <span className="page-link Cursor_hover" onClick={() => Set_Current_Page(Current_Page - 1)}>Previous</span>
                                                 </li>
-                                                <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                                <li className="page-item" aria-current="page">
-                                                    <span className="page-link">2</span>
-                                                </li>
-                                                <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                                <li className="page-item">
-                                                    <a className="page-link" href="#">Next</a>
+                                                {
+                                                    Array.from({ length: Total_Pages }, (_, index) =>
+                                                        <li key={index} onClick={() => Set_Current_Page(index + 1)} className={Current_Page === index + 1 ? "page-item active disabled" : "page-item Cursor_hover"}><a className="page-link">{index + 1}</a></li>
+                                                    )
+                                                }
+
+                                                <li className={Current_Page === Total_Pages ? "page-item disabled" : "page-item"}>
+                                                    <span className="page-link Cursor_hover" onClick={() => Set_Current_Page(Current_Page + 1)}>Next</span>
                                                 </li>
                                             </ul>
                                         </nav>
