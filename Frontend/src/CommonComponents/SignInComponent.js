@@ -31,7 +31,6 @@ const SignInComponent = () => {
             // alert(User_Ckeck_ACK_JSON?.Message)
             if (User_Ckeck_ACK.status === 202) {
                 localStorage.clear()
-                console.log(User_Ckeck_ACK_JSON.Data.User_Token)
                 localStorage.setItem("User_Data", JSON.stringify({ "Authorization_Token": User_Ckeck_ACK_JSON.Data.User_Token, "Remember_me_boolen_state": true }))
                 window.history.replaceState(null, null, "/")
                 navigate("/" + User_Ckeck_ACK_JSON?.Data?.role, { replace: true })
@@ -42,7 +41,7 @@ const SignInComponent = () => {
             console.log(error)
         }
     }
-    
+
     const login = async (e) => {
         try {
             e.preventDefault()
@@ -59,7 +58,6 @@ const SignInComponent = () => {
 
             if (User_ACK.status === 201) {
                 localStorage.clear()
-                console.log(User_ACK_JSON.Data.User_Token)
                 localStorage.setItem("User_Data", JSON.stringify({ "Authorization_Token": User_ACK_JSON.Data.User_Token, "Remember_me_boolen_state": Remember_me }))
                 navigate("/" + User_ACK_JSON.Data.role)
             }

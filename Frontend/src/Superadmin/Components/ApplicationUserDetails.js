@@ -18,7 +18,10 @@ const ApplicationUserDetails = () => {
     useEffect(() => {
         const Fatch_Users_Helper = async () => {
             const User_Data = JSON.parse(localStorage.getItem("User_Data"))
-            if (User_Data && User_Data.Remember_me_boolen_state) return await Fatch_Users(User_Data.Authorization_Token)
+            if (User_Data && User_Data.Authorization_Token) return await Fatch_Users(User_Data.Authorization_Token)
+            localStorage.clear()
+            window.history.replaceState(null, null, "/")
+            navigate("/", { replace: true })
         }
         Fatch_Users_Helper()
     }, [])
@@ -209,7 +212,7 @@ const ApplicationUserDetails = () => {
                 </div>
                 <Footer />
             </div>
-            {Toggle && <CreateAccountModal fun={setToggle} />}
+            {Toggle && <CreateAccountModal fun={setToggle} All_Users = {Fatch_Users} />}
         </div>
     )
 }
