@@ -10,12 +10,12 @@ const generateotp = (email) => {
 
 const verifyotp = (email, otp) => {
     const otpentry = otpmap.get(email)
-    if (!otpentry) return { status: false, message: "OTP is not found or expired" }
+    if (!otpentry) return { status: false, Message: "OTP is not found or expired" }
     if (otpentry === otp) {
         otpmap.delete(email);
-        return { status: true, message: "Otp Matched Successful" }
+        return { status: true, Message: "Otp Matched Successful" }
     }
-    return { status: false, message: 'Invalid OTP' }
+    return { status: false, Message: 'Invalid OTP' }
 }
 
 module.exports = { generateotp, verifyotp }

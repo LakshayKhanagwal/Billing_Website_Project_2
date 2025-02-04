@@ -17,7 +17,7 @@ Routes.post("/Shopkeeper_Verification", async (request, response) => {
         const { name, phone, email, password, address, city, state } = request.body
 
         //Fileld check
-        if (!name || !phone || !email || !password || !address || !city || !state) return Resopnse_Handler(response, 404, "Field can't be Empty.")
+        if (!name || !phone || !email || !password || !address || !city || !state || city==="none" || state ==="none") return Resopnse_Handler(response, 404, "Field can't be Empty.")
 
         // Check E-mail for exixting account
         const ExistingUser = await User.findOne({ email })
@@ -37,7 +37,7 @@ Routes.post("/Shopkeper_OTP_Verification", async (request, response) => {
         const { name, phone, email, password, address, city, state, OTP } = request.body
 
         //Fileld check
-        if (!name || !phone || !email || !password || !address || !city || !state) return Resopnse_Handler(response, 404, "Field can't be Empty.")
+        if (!name || !phone || !email || !password || !address || !city || !state || city==="none" || state ==="none") return Resopnse_Handler(response, 404, "Field can't be Empty.")
 
         if (!OTP) return Resopnse_Handler(response, 404, "Enter The OTP")
 

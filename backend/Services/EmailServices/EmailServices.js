@@ -21,9 +21,9 @@ const otptoemailforverification=async(response,email,OTP)=>{
       
     try {
         const info= await transporter.sendMail(mailOptions)
-        return response.status(202).json({message:"OTP sent successfully",data:info.response})
+        return response.status(202).json({Message:"OTP sent successfully",data:info.response})
     } catch (error) {
-        return resp.status(400).json({message:"Email is not valid."})
+        return resp.status(400).json({Message:"Email is not valid."})
     }
 }
 
