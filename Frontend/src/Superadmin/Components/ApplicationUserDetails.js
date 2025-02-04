@@ -10,7 +10,7 @@ const ApplicationUserDetails = () => {
     const [Total_Pages, Set_Total_Pages] = useState(0)
     const [Users_Divided, Set_Users_Divided] = useState(0)
     const [User_Count, Set_User_Count] = useState({})
-    const Users_Per_Page = 3
+    const Users_Per_Page = 4
 
     const navigate = useNavigate()
     const [Shopkeepers_Executives, Set_Shopkeepers_Executives] = useState([])
