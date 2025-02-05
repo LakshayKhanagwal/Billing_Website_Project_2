@@ -3,25 +3,25 @@ import Title from '../../CommonComponents/Title'
 import Footer from '../../CommonComponents/Footer'
 import * as xlsx from "xlsx"
 
-const AddExcelData = ({Product_Excel}) => {
+const AddExcelData = ({ Product_Excel }) => {
   const File_Upload = useRef()
 
   const Upload = (e) => {
     const Excel_File = e.target.files[0]
-    if(!Excel_File) return
+    if (!Excel_File) return
     if (Excel_File?.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return alert("Only Excel Files are Allowed.")
-    
-      const reader = new FileReader()
-      reader.readAsArrayBuffer(Excel_File)
-      reader.onload = ()=>{
-        const WorkBook = xlsx.read(reader.result,{type:'buffer'})
-        const WorkSheetName = WorkBook.SheetNames[0]
-        const WorkSheet = WorkBook.Sheets[WorkSheetName]
-        const Final_WorkSheet_Data = xlsx.utils.sheet_to_json(WorkSheet)
 
-        Product_Excel(Final_WorkSheet_Data)
-      }
-      
+    const reader = new FileReader()
+    reader.readAsArrayBuffer(Excel_File)
+    reader.onload = () => {
+      const WorkBook = xlsx.read(reader.result, { type: 'buffer' })
+      const WorkSheetName = WorkBook.SheetNames[0]
+      const WorkSheet = WorkBook.Sheets[WorkSheetName]
+      const Final_WorkSheet_Data = xlsx.utils.sheet_to_json(WorkSheet)
+
+      if (!Final_WorkSheet_Data[0].name || !Final_WorkSheet_Data[0].model || !Final_WorkSheet_Data[0].description || !Final_WorkSheet_Data[0].company || !Final_WorkSheet_Data[0].price || !Final_WorkSheet_Data[0].rate || !Final_WorkSheet_Data[0].tax || !Final_WorkSheet_Data[0].discount || !Final_WorkSheet_Data[0].stock) return alert("Excel Sheet is not in Proper Format. Please Select Proper formated excel Sheet.")
+      Product_Excel(Final_WorkSheet_Data)
+    }
   }
   return (
     <div className="main-content">
@@ -69,10 +69,6 @@ const AddExcelData = ({Product_Excel}) => {
                         </li>
                       </ul>
                     </form>
-                    <div className="hstack gap-2 mt-4">
-                      <button type="submit" className="btn btn-primary">Save</button>
-                      <button type="button" className="btn btn-light">Discard</button>
-                    </div>
                   </div>
                 </div>
               </div>

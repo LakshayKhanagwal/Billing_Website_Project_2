@@ -1,3 +1,15 @@
 .Cursor_hover:hover{
     cursor: pointer;
 }
+
+.item-end{
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    align-content: start;
+}
+
+.item-center{
+    width: .5%;
+    margin: 0 auto;
+}
