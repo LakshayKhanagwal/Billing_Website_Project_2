@@ -153,6 +153,36 @@ Routes.post("/Add_Product", Token_Verification, async (request, response) => {
     }
 })
 
+const Validate_Product = (Product_object, schema) => {
+    const Schema_Keys = Object.keys(schema.paths).filter((key) => key !== "__v" && key !== "_id")
+    console.log(Schema_Keys)
+}
+
+const pro = {
+    company: "Xiaomi", description: "6GB RAM, 128GB Storage", discount: 15, model: "21091116I", name: "Redmi Note 11", price: 13999, rate: 4.2, stock: 200, tax: 12
+}
+
+// Validate_Product(pro,Product.schema)
+console.log(Product)
+
+Routes.post("/Add_Miltiple_Product", Token_Verification, async (request, response) => {
+    try {
+        const { name, model, description, company, price, rate, tax, discount, stock, userid } = request.body
+
+        if (!name || !model || !description || !company || !price || !rate || !tax || !discount || !userid) return response.status(404).json({ Message: "Field can't be Empty." })
+
+        const Existing_Product = await Product.findOne({ model })
+        if (Existing_Product) return response.status(400).json({ Message: "This Product is Already Exixts." })
+
+        const New_Product = await Product.create({ userid: request.user._id, name, company, model, description, price, discount, rate, tax, stock, })
+
+        return response.status(201).json({ Message: "Product added Successfully", New_Product })
+
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error")
+    }
+})
+
 Routes.get("/Get_Products", Token_Verification, async (request, response) => {
     try {
         const All_Products = await Product.find({ userid: request.user._id })

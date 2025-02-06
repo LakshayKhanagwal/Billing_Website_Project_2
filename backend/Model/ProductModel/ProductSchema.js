@@ -47,6 +47,6 @@ const productschema = new mongoose.Schema({
 
 })
 
-const Product = mongoose.model("products", productschema)
+const Product = mongoose.model(process.env.MONGODB_PRODUCT_COLLECTION, productschema)
 
 module.exports = Product
