@@ -1,7 +1,7 @@
 const express = require('express')
 const Routes = express.Router()
 const { User, Shopkeeper, Executive } = require("../Model/UserModels/Userschema")
-const { Product } = require("../Model/ProductModel/ProductSchema")
+const Product = require("../Model/ProductModel/ProductSchema")
 const { generateotp, verifyotp } = require('../Services/OtpServices/OtpServices')
 const { otptoemailforverification } = require('../Services/EmailServices/EmailServices')
 const Resopnse_Handler = require('../Handle_response/ResponseHandler')
@@ -155,15 +155,15 @@ Routes.post("/Add_Product", Token_Verification, async (request, response) => {
 
 const Validate_Product = (Product_object, schema) => {
     const Schema_Keys = Object.keys(schema.paths).filter((key) => key !== "__v" && key !== "_id")
-    console.log(Schema_Keys)
+    const Product_Object_Keys = Object.keys(Product_object)
+    console.log(Schema_Keys,Product_Object_Keys)
 }
 
 const pro = {
     company: "Xiaomi", description: "6GB RAM, 128GB Storage", discount: 15, model: "21091116I", name: "Redmi Note 11", price: 13999, rate: 4.2, stock: 200, tax: 12
 }
 
-// Validate_Product(pro,Product.schema)
-console.log(Product)
+Validate_Product(pro,Product.schema)
 
 Routes.post("/Add_Miltiple_Product", Token_Verification, async (request, response) => {
     try {
