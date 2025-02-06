@@ -10,6 +10,8 @@
 }
 
 .item-center{
-    width: .5%;
-    margin: 0 auto;
+    width: 33%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
 }

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import Footer from '../../CommonComponents/Footer'
 import Title from '../../CommonComponents/Title'
 import EditExcelProduct from './EditExcelProduct'
+import { useNavigate } from 'react-router-dom'
 
 const ReviewExcelData = ({ Product_Excel, Set_Product_Excel }) => {
     const [Product_Data, Set_Product_Data] = useState([])
@@ -12,6 +13,7 @@ const ReviewExcelData = ({ Product_Excel, Set_Product_Excel }) => {
     const [Total_Pages, Set_Total_Pages] = useState(0)
     const [Product_Count, Set_Product_Count] = useState({})
     const Products_Per_Page = 10
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (Selected_Product_Data) {
@@ -48,15 +50,42 @@ const ReviewExcelData = ({ Product_Excel, Set_Product_Excel }) => {
         Set_Product_Excel(arr)
     }
 
+    const Save = async (e) => {
+        try {
+            e.preventDefault()
+
+            const User_Data = JSON.parse(localStorage.getItem("User_Data"))
+            if (!User_Data || !User_Data.Authorization_Token) {
+                localStorage.clear()
+                window.history.replaceState(null, null, "/")
+                navigate("/", { replace: true })
+            }
+
+            const Users = await fetch("http://localhost:3100/Api/Add_Miltiple_Product", {
+                method: "post",
+                body: JSON.stringify({ Product_Excel }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": User_Data.Authorization_Token
+                }
+            })
+            const Users_All = await Users.json()
+            alert(Users_All?.Message)
+            if (Users.status === 202) return navigate("/AllProducts")
+
+        } catch (error) {
+            alert("Something Wents Wrong. Please Try Again.")
+        }
+    }
+
     return (
         <div className='modal-open' >
             <div className="main-content">
                 <div className="page-content">
                     <div className="container-fluid">
-                        <Title Name={"Product List"} />
                         <div className="row pb-4 gy-3">
                             <div className="col-sm-4">
-                                <a href="#" className="btn btn-primary addtax-modal"><i className="las la-plus me-1" /> Add Product</a>
+                                <Title Name={"Product List"} />
                             </div>
                             <div className="col-sm-auto ms-auto">
                                 <div className="d-flex gap-3">
@@ -160,12 +189,12 @@ const ReviewExcelData = ({ Product_Excel, Set_Product_Excel }) => {
                                     </div>
                                 </div>
                                 <div className="row align-items-center mb-2 gy-3">
-                                    <div className="col-md-5">
+                                    <div className="col-md-4">
                                         <p className="mb-0 text-muted">Showing <b>{Product_Count?.First_Index}</b> to <b>{Product_Count?.Last_Index}</b> of <b>{Product_Count?.Total_Users}</b> results</p>
                                     </div>
-                                    <div className="hstack gap-2 col-md-2 align-items-start" >
-                                        <button type="submit" className="btn btn-primary">Save</button>
-                                        <button type="button" onClick={()=>Set_Product_Excel([])} className="btn btn-light btn-outline-danger">Discard</button>
+                                    <div className="hstack gap-2 col-md-4 align-items-center item-center" >
+                                        <button type="submit" onClick={Save} className="btn btn-primary">Save</button>
+                                        <button type="button" onClick={() => Set_Product_Excel([])} className="btn btn-light btn-outline-danger">Discard</button>
                                     </div>
                                     <div className="col-sm-auto ms-auto">
                                         <nav aria-label="...">

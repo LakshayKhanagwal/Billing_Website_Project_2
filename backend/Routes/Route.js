@@ -156,27 +156,35 @@ Routes.post("/Add_Product", Token_Verification, async (request, response) => {
 const Validate_Product = (Product_object, schema) => {
     const Schema_Keys = Object.keys(schema.paths).filter((key) => key !== "__v" && key !== "_id")
     const Product_Object_Keys = Object.keys(Product_object)
-    console.log(Schema_Keys,Product_Object_Keys)
-}
+    for (let key of Schema_Keys) {
+        if (!Product_object.hasOwnProperty(key) || Product_object[key] === null || Product_object[key] === "") return "key " + key + " is missing."
+    }
 
-const pro = {
-    company: "Xiaomi", description: "6GB RAM, 128GB Storage", discount: 15, model: "21091116I", name: "Redmi Note 11", price: 13999, rate: 4.2, stock: 200, tax: 12
+    for (let key of Product_Object_Keys) {
+        if (!Schema_Keys.includes(key)) return "key " + key + " is invalid or extra."
+    }
+    return null
 }
-
-Validate_Product(pro,Product.schema)
 
 Routes.post("/Add_Miltiple_Product", Token_Verification, async (request, response) => {
     try {
-        const { name, model, description, company, price, rate, tax, discount, stock, userid } = request.body
+        const { Product_Excel } = request.body
+        if (!Array.isArray(Product_Excel) || Product_Excel.length === 0) return Resopnse_Handler(response, 400, "Invalid input Format.")
 
-        if (!name || !model || !description || !company || !price || !rate || !tax || !discount || !userid) return response.status(404).json({ Message: "Field can't be Empty." })
+        const Updated_Producl_Excel = Product_Excel.map(Product_Excel => { return { ...Product_Excel, userid: request.user._id } })
+        const error = []
+        Updated_Producl_Excel.map(async (Product_Data, index) => {
+            const Validaton_Error = Validate_Product(Product_Data, Product.schema);
+            if (Validaton_Error) error.push({ index, error: Validaton_Error })
 
-        const Existing_Product = await Product.findOne({ model })
-        if (Existing_Product) return response.status(400).json({ Message: "This Product is Already Exixts." })
+            const Existing_Product = await Product.findOne({ model: Product_Data.model })
+            if (Existing_Product) error.push({ index, error: "The Model Number " + Product_Data.model + " is already Exists." })
+        })
 
-        const New_Product = await Product.create({ userid: request.user._id, name, company, model, description, price, discount, rate, tax, stock, })
+        if (error.length > 0) return Resopnse_Handler(response, 400, "Validation Error Occured.", null, error)
 
-        return response.status(201).json({ Message: "Product added Successfully", New_Product })
+        const Product_Insert_ACK = await Product.insertMany(Updated_Producl_Excel)
+        return Resopnse_Handler(response, 202, "Product Added Successfully.", Product_Insert_ACK)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
