@@ -195,10 +195,9 @@ Routes.get("/Get_Products", Token_Verification, async (request, response) => {
     try {
         const All_Products = await Product.find({ userid: request.user._id })
 
-        if (All_Products.length === 0) return resp.status(404).json({ message: "Your product list is empty" });
+        if (All_Products.length === 0) return resp.status(404).json({ message: "Your product list is empty." });
 
         return response.status(202).json({ Message: "All Products fetched successfully.", All_Products });
-
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
     }

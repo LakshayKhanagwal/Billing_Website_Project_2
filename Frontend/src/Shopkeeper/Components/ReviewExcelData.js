@@ -111,7 +111,7 @@ const ReviewExcelData = ({ Product_Excel, Set_Product_Excel }) => {
                                     <div className="card-body">
                                         <div className="table-responsive table-card">
 
-                                            <table className="table table-nowrap align-middle mb-0">
+                                            <table className="table table-nowrap table-striped align-middle mb-0">
                                                 <thead>
                                                     <tr className="text-muted text-uppercase">
                                                         {/* <th style={{ width:"5%"}}>
