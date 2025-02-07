@@ -139,14 +139,16 @@ Routes.post("/Add_Product", Token_Verification, async (request, response) => {
     try {
         const { name, model, description, company, price, rate, tax, discount, stock, userid } = request.body
 
-        if (!name || !model || !description || !company || !price || !rate || !tax || !discount || !userid) return response.status(404).json({ Message: "Field can't be Empty." })
+        // userid = request.user._id
+
+        if (!name || !model || !description || !company || !price || !rate || !tax || !discount) return Resopnse_Handler(response,400,"Field can't be Empty.")
 
         const Existing_Product = await Product.findOne({ model })
-        if (Existing_Product) return response.status(400).json({ Message: "This Product is Already Exixts." })
+        if (Existing_Product) return Resopnse_Handler(response,400,"This Product is Already Exixts.")
 
-        const New_Product = await Product.create({ userid: request.user._id, name, company, model, description, price, discount, rate, tax, stock, })
+        const New_Product = await Product.create({ userid: request.user._id, name, company, model, description, price, discount, rate, tax, stock })
 
-        return response.status(201).json({ Message: "Product added Successfully", New_Product })
+        return Resopnse_Handler(response,202,"Product added Successfully.",New_Product)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
