@@ -7,6 +7,7 @@ import AddProductModal from './AddProductModal'
 const AllProductsComponent = () => {
     const [Product_Updated_Data, Set_Updated_Product_Data] = useState([])
     const [EditProductToggle, setEditProductToggle] = useState(false)
+    const [Edit_Product, Set_EditProduct] = useState({})
     const [AddProductToggle, setAddProductToggle] = useState(false)
     const [Product_Count, Set_Product_Count] = useState({})
     const [Product_Data, Set_Product_Data] = useState([])
@@ -56,6 +57,10 @@ const AllProductsComponent = () => {
         }
     }
 
+    const Edit = (Product)=>{
+        Set_EditProduct(Product)
+        setEditProductToggle(!EditProductToggle)
+    }
     return (
         <div>
             <div className="main-content">
@@ -141,14 +146,14 @@ const AllProductsComponent = () => {
                                                                                                 </li>
                                                                                                 <li className="dropdown-divider" />
                                                                                                 <li>
-                                                                                                    <button onClick={() => setEditProductToggle(true)} className="dropdown-item" href="javascript:void(0);"><i className="las la-pen fs-18 align-middle me-2 text-muted" />
+                                                                                                    <button onClick={() => Edit(Product)} className="dropdown-item" href="javascript:void(0);"><i className="las la-pen fs-18 align-middle me-2 text-muted" />
                                                                                                         Edit</button>
                                                                                                 </li>
                                                                                                 <li>
-                                                                                                    <a className="dropdown-item remove-item-btn" href="#">
+                                                                                                    <span className="dropdown-item remove-item-btn Cursor_hover">
                                                                                                         <i className="las la-trash-alt fs-18 align-middle me-2 text-muted" />
                                                                                                         Delete
-                                                                                                    </a>
+                                                                                                    </span>
                                                                                                 </li>
                                                                                             </ul>
                                                                                         </div>
@@ -198,8 +203,9 @@ const AllProductsComponent = () => {
                 </div>
                 <Footer />
             </div>
-            {AddProductToggle && <AddProductModal setToggle={setAddProductToggle} />}
-            {EditProductToggle && <EditProductModal setToggle={setEditProductToggle} />}
+            {AddProductToggle && <AddProductModal setToggle={setAddProductToggle} addToggle={AddProductToggle} Fetch_Product={Fatch_Users_Product} />}
+            {EditProductToggle && <AddProductModal Edit_Toggle ={EditProductToggle} Set_Edit_Toggle={setEditProductToggle} Fetch_Product={Fatch_Users_Product} Product_Data={Edit_Product}  />}
+            {/* {EditProductToggle && <EditProductModal setToggle={setEditProductToggle} />} */}
         </div>
     )
 }

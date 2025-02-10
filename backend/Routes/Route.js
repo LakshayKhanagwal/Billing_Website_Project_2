@@ -225,9 +225,8 @@ Routes.delete("/Delete_Product/:id", Token_Verification, async (request, respons
 
 Routes.put("/Update_Product/:id", Token_Verification, async (request, response) => {
     try {
-        const {
-            name, company, model, stock, description, price, discount, rate, tax, } = req.body;
-        if (!name || !company || !model || !description || !price || !discount || !rate || !tax) return resp.status(404).json({ Message: "Field can't be Empty" });
+        const {name, company, model, stock, description, price, discount, rate, tax } = req.body;
+        if (!name || !company || !model || !description || !price || !discount || !rate || !tax || !stock) return resp.status(404).json({ Message: "Field can't be Empty" });
 
         const { id } = request.params;
         if (!id) return response.status(404).json({ Message: "Please select the product" });
