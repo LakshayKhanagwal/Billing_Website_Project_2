@@ -141,14 +141,14 @@ Routes.post("/Add_Product", Token_Verification, async (request, response) => {
 
         // userid = request.user._id
 
-        if (!name || !model || !description || !company || !price || !rate || !tax || !discount) return Resopnse_Handler(response,400,"Field can't be Empty.")
+        if (!name || !model || !description || !company || !price || !rate || !tax || !discount) return Resopnse_Handler(response, 400, "Field can't be Empty.")
 
         const Existing_Product = await Product.findOne({ model })
-        if (Existing_Product) return Resopnse_Handler(response,400,"This Product is Already Exixts.")
+        if (Existing_Product) return Resopnse_Handler(response, 400, "This Product is Already Exixts.")
 
         const New_Product = await Product.create({ userid: request.user._id, name, company, model, description, price, discount, rate, tax, stock })
 
-        return Resopnse_Handler(response,202,"Product added Successfully.",New_Product)
+        return Resopnse_Handler(response, 202, "Product added Successfully.", New_Product)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
@@ -195,7 +195,7 @@ Routes.post("/Add_Miltiple_Product", Token_Verification, async (request, respons
 
 Routes.get("/Get_Products", Token_Verification, async (request, response) => {
     try {
-        const All_Products = await Product.find({ userid: request.user._id })
+        const All_Products = await Product.find({ userid: request.user._id }).select("-userid")
 
         if (All_Products.length === 0) return resp.status(404).json({ message: "Your product list is empty." });
 
@@ -208,15 +208,15 @@ Routes.get("/Get_Products", Token_Verification, async (request, response) => {
 Routes.delete("/Delete_Product/:id", Token_Verification, async (request, response) => {
     try {
         const { id } = request.params;
-        if (!id) return response.status(404).json({ Message: "Please select the product" });
+        if (!id) return Resopnse_Handler(response, 404, "Please select the product")
 
         const Existing_Product = await Product.findOne({ _id: id, userid: request.user._id });
 
-        if (!Existing_Product) return response.status(404).json({ Message: "This product is not found in the product list." });
+        if (!Existing_Product) return Resopnse_Handler(response, 404, "This product is not found in the product list.")
 
         const Delete_Product_ACK = await Product.deleteOne({ _id: id, userid: request.user._id });
 
-        return response.status(202).json({ Message: "Product deleted successfully", Delete_Product_ACK });
+        return Resopnse_Handler(response, 202, "Product deleted successfully",Delete_Product_ACK)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
@@ -225,22 +225,21 @@ Routes.delete("/Delete_Product/:id", Token_Verification, async (request, respons
 
 Routes.put("/Update_Product/:id", Token_Verification, async (request, response) => {
     try {
-        const {name, company, model, stock, description, price, discount, rate, tax } = req.body;
-        if (!name || !company || !model || !description || !price || !discount || !rate || !tax || !stock) return resp.status(404).json({ Message: "Field can't be Empty" });
+        const { name, company, model, stock, description, price, discount, rate, tax } = request.body;
+        if (!name || !company || !model || !description || !price || !discount || !rate || !tax || !stock) return Resopnse_Handler(response, 404, "Field can't be Empty")
 
         const { id } = request.params;
-        if (!id) return response.status(404).json({ Message: "Please select the product" });
+        if (!id) return Resopnse_Handler(response, 404, "Please select the product.")
 
-        const Existing_Product = await Product.findOne({ _id: id });
+        const Existing_Product = await Product.findOne({ _id: id, userid: request.user._id });
+        if (!Existing_Product) return Resopnse_Handler(response, 404, "This product is not found in the product list.")
 
-        if (!Existing_Product) return response.status(404).json({ Message: "This product is not found in the product list." });
-
-        const Existing_Modal = await Product.findOne({ model });
-        if (Existing_Modal) return resp.status(400).json({ Message: "Product of this model is already exists in your product list" });
+        const Existing_Product_Model = await Product.findOne({ model, userid: request.user._id });
+        if (Existing_Product_Model && Existing_Product_Model._id.toString() !== id) return Resopnse_Handler(response, 400, "Product of this model is already exists in your product list")
 
         const Update_Product_ACK = await Product.updateOne({ _id: id }, { $set: { name, company, model, description, price, discount, rate, tax, stock } });
 
-        return response.status(202).json({ Message: "Product Updated successfully", Update_Product_ACK });
+        return Resopnse_Handler(response, 202, "Product Updated successfully", Update_Product_ACK)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")

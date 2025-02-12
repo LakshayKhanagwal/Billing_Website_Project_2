@@ -23,7 +23,17 @@ const AddExcelData = ({ Product_Excel }) => {
       Product_Excel(Final_WorkSheet_Data)
     }
   }
-  
+
+  const download = (e) => {
+    e.preventDefault()
+    const Download_Link = document.createElement("a")
+    Download_Link.href = "/assets/format.xlsx"
+    Download_Link.setAttribute("download", "format.xlsx")
+    document.body.appendChild(Download_Link)
+    Download_Link.click()
+    document.body.removeChild(Download_Link)
+  }
+
   return (
     <div className="main-content">
       <div className="page-content">
@@ -52,18 +62,18 @@ const AddExcelData = ({ Product_Excel }) => {
                             <div className="d-flex p-2">
                               <div className="flex-shrink-0 me-3">
                                 <div className="avatar-sm bg-light rounded">
-                                  <img data-dz-thumbnail className="img-fluid rounded d-block" src="assets/images/new-document.png" />
+                                  <img data-dz-thumbnail className="img-fluid rounded d-block" src="assets/images/new-document.png" alt='' />
                                 </div>
                               </div>
                               <div className="flex-grow-1">
                                 <div className="pt-1">
-                                  <h5 className="fs-14 mb-1" data-dz-name>&nbsp;</h5>
+                                  <h5 className="fs-14 mb-1" data-dz-name>Download Excel Format.</h5>
                                   <p className="fs-13 text-muted mb-0" data-dz-size />
                                   <strong className="error text-danger" data-dz-errormessage />
                                 </div>
                               </div>
                               <div className="flex-shrink-0 ms-3">
-                                <button data-dz-remove className="btn btn-sm btn-danger">Delete</button>
+                                <button data-dz-remove className="btn btn-sm btn-danger" onClick={download}>Download</button>
                               </div>
                             </div>
                           </div>

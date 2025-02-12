@@ -41,14 +41,36 @@ const AddProductModal = (props) => {
         }
     }
 
-    const Update = (e) => {
+    const Update = async (e) => {
         try {
             e.preventDefault()
-            
+            Set_Loading(true)
+
+            const User_Data = JSON.parse(localStorage.getItem("User_Data"))
+            if (!User_Data || !User_Data.Authorization_Token) {
+                localStorage.clear()
+                window.history.replaceState(null, null, "/")
+                navigate("/")
+            }
+            const Product_Add_ACK = await fetch("http://localhost:3100/Api/Update_Product/" + props.Product_Data._id, {
+                method: "put",
+                body: JSON.stringify(Product_Details),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": User_Data.Authorization_Token
+                }
+            })
+            const Product_Add_ACK_JSON = await Product_Add_ACK.json()
+            alert(Product_Add_ACK_JSON?.Message)
+            if (Product_Add_ACK.status === 202) {
+                props.Fetch_Product(User_Data.Authorization_Token)
+                return props.Set_Edit_Toggle(false)
+            }
+            return Set_Loading(false)
         } catch (error) {
             console.log(error)
         }
-        
+
     }
 
     return (
@@ -67,21 +89,21 @@ const AddProductModal = (props) => {
                                     <div className='row'>
                                         <div className="mb-3">
                                             <label htmlFor="name" className="form-label">Product Name</label>
-                                            <input type="text" className="form-control" name='name' placeholder="Enter Product Name" value={Product_Details?.name} onChange={set} />
+                                            <input type="text" className={props.setToggle ? "form-control" : "form-control Cursor_Disable"} disabled={props.setToggle ? false : true} name='name' placeholder="Enter Product Name" value={Product_Details?.name} onChange={set} />
                                         </div>
                                         <div className='row'>
                                             <div className="mb-3 col-6">
                                                 <label htmlFor="model" className="form-label">Product Model</label>
-                                                <input type="text" className="form-control" name='model' placeholder="Enter Product Model" value={Product_Details?.model} onChange={set} />
+                                                <input type="text" className={props.setToggle ? "form-control" : "form-control Cursor_Disable"} disabled={props.setToggle ? false : true} name='model' placeholder="Enter Product Model" value={Product_Details?.model} onChange={set} />
                                             </div>
                                             <div className="mb-3 col-6">
                                                 <label htmlFor="company" className="form-label">Company Name</label>
-                                                <input type="text" className="form-control" name='company' placeholder="Enter Company" value={Product_Details?.company} onChange={set} />
+                                                <input type="text" className={props.setToggle ? "form-control" : "form-control Cursor_Disable"} disabled={props.setToggle ? false : true} name='company' placeholder="Enter Company" value={Product_Details?.company} onChange={set} />
                                             </div>
                                         </div>
                                         <div className="mb-3">
                                             <label htmlFor="description" className="form-label">Product Description</label>
-                                            <textarea type="text" className="form-control" name='description' placeholder="Enter Product Description" value={Product_Details?.description} onChange={set} />
+                                            <textarea type="text" className={props.setToggle ? "form-control" : "form-control Cursor_Disable"} disabled={props.setToggle ? false : true} name='description' placeholder="Enter Product Description" value={Product_Details?.description} onChange={set} />
                                         </div>
                                         <div className='row'>
                                             <div className="mb-3 col-6">

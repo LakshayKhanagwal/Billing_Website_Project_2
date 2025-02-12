@@ -2,6 +2,10 @@
     cursor: pointer;
 }
 
+.Cursor_Disable:hover{
+    cursor: not-allowed;
+}
+
 .item-end{
     width: 100%;
     display: flex;

@@ -49,7 +49,7 @@ const AllProductsComponent = () => {
                 }
             })
             const User_Products_JSON = await User_Products.json()
-            alert(User_Products_JSON?.Message)
+            // alert(User_Products_JSON?.Message)
             if (User_Products.status === 202) return Set_Product_Data(User_Products_JSON.All_Products)
             alert(User_Products_JSON?.Message)
         } catch (error) {
@@ -57,9 +57,37 @@ const AllProductsComponent = () => {
         }
     }
 
-    const Edit = (Product)=>{
+    const Edit = (Product) => {
         Set_EditProduct(Product)
         setEditProductToggle(!EditProductToggle)
+    }
+
+    const Delete_Product = async (Product) => {
+        try {
+            const User_Data = JSON.parse(localStorage.getItem("User_Data"))
+            if (!User_Data || !User_Data.Authorization_Token) {
+                localStorage.clear()
+                window.history.replaceState(null, null, "/")
+                navigate("/")
+            }
+            // eslint-disable-next-line no-restricted-globals
+            if (confirm("Are you really wanna delete this product")) {
+                console.log("object")
+                const Product_Add_ACK = await fetch("http://localhost:3100/Api/Delete_Product/" + Product._id, {
+                    method: "delete",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": User_Data.Authorization_Token
+                    }
+                })
+                const Product_Add_ACK_JSON = await Product_Add_ACK.json()
+                alert(Product_Add_ACK_JSON?.Message)
+                if (Product_Add_ACK.status === 202) return Fatch_Users_Product(User_Data.Authorization_Token)
+            } else {
+            }
+        } catch (error) {
+
+        }
     }
     return (
         <div>
@@ -126,7 +154,7 @@ const AllProductsComponent = () => {
                                                                                 <tr>
                                                                                     <td>{Product_Count.First_Index + index}</td>
                                                                                     <td>
-                                                                                        <a href="#javascript: void(0);" className="text-body align-middle fw-medium">{Product.name}</a>
+                                                                                        <a href="#javascript: void(0);" className="text-body align-middle fw-medium"> <b>{Product.name}</b>-<i>{Product.model}</i></a>
                                                                                     </td>
                                                                                     <td>{Product.company}</td>
                                                                                     <td>{Product.price}</td>
@@ -150,7 +178,7 @@ const AllProductsComponent = () => {
                                                                                                         Edit</button>
                                                                                                 </li>
                                                                                                 <li>
-                                                                                                    <span className="dropdown-item remove-item-btn Cursor_hover">
+                                                                                                    <span onClick={() => Delete_Product(Product)} className="dropdown-item remove-item-btn Cursor_hover">
                                                                                                         <i className="las la-trash-alt fs-18 align-middle me-2 text-muted" />
                                                                                                         Delete
                                                                                                     </span>
@@ -204,7 +232,7 @@ const AllProductsComponent = () => {
                 <Footer />
             </div>
             {AddProductToggle && <AddProductModal setToggle={setAddProductToggle} addToggle={AddProductToggle} Fetch_Product={Fatch_Users_Product} />}
-            {EditProductToggle && <AddProductModal Edit_Toggle ={EditProductToggle} Set_Edit_Toggle={setEditProductToggle} Fetch_Product={Fatch_Users_Product} Product_Data={Edit_Product}  />}
+            {EditProductToggle && <AddProductModal Edit_Toggle={EditProductToggle} Set_Edit_Toggle={setEditProductToggle} Fetch_Product={Fatch_Users_Product} Product_Data={Edit_Product} />}
             {/* {EditProductToggle && <EditProductModal setToggle={setEditProductToggle} />} */}
         </div>
     )
