@@ -7,6 +7,7 @@ const { otptoemailforverification } = require('../Services/EmailServices/EmailSe
 const Resopnse_Handler = require('../Handle_response/ResponseHandler')
 const jwt = require("jsonwebtoken")
 const Token_Verification = require('../MiddleWares/TokenVerification')
+const Customer = require("../Model/CustomerModels/CustomerSchema")
 
 Routes.get("/", async (request, response) => {
     return response.status(200).json({ message: "Server Health is Fine." })
@@ -216,7 +217,7 @@ Routes.delete("/Delete_Product/:id", Token_Verification, async (request, respons
 
         const Delete_Product_ACK = await Product.deleteOne({ _id: id, userid: request.user._id });
 
-        return Resopnse_Handler(response, 202, "Product deleted successfully",Delete_Product_ACK)
+        return Resopnse_Handler(response, 202, "Product deleted successfully", Delete_Product_ACK)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
@@ -240,6 +241,35 @@ Routes.put("/Update_Product/:id", Token_Verification, async (request, response) 
         const Update_Product_ACK = await Product.updateOne({ _id: id }, { $set: { name, company, model, description, price, discount, rate, tax, stock } });
 
         return Resopnse_Handler(response, 202, "Product Updated successfully", Update_Product_ACK)
+
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error")
+    }
+})
+
+Routes.post("/Add_Customer", Token_Verification, async (request, response) => {
+    try {
+        const { name, phone, address } = request.body
+        if (!name || !phone || !address) return Resopnse_Handler(response, 404, "Field is Empty.")
+
+        const Existing_Customer = await Customer.findOne({ phone, customerof: request.user._id })
+        if (Existing_Customer) return Resopnse_Handler(response, 404, "Customer Already Exists.")
+
+        const Customer_ACK = await Customer.create({ name, phone, address, customerof: request.user._id })
+
+        return Resopnse_Handler(response, 202, "Customer Added Successfully.", Customer_ACK)
+
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error")
+    }
+})
+
+Routes.get("/Get_All_Customer", Token_Verification, async (request, response) => {
+    try {
+        const All_Customer = await Customer.find({ customerof: request.user._id }).select("-customerof -__v")
+        if (!All_Customer || All_Customer.length === 0) return Resopnse_Handler(response, 404, "No Customer for Display.")
+
+        return Resopnse_Handler(response, 202, "Customer Fetched Successfully.", All_Customer)
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")

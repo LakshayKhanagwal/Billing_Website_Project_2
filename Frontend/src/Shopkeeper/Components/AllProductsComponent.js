@@ -89,6 +89,7 @@ const AllProductsComponent = () => {
 
         }
     }
+    
     return (
         <div>
             <div className="main-content">

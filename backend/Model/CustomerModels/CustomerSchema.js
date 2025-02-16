@@ -30,6 +30,6 @@ const CustomerSchema = new mongoose.Schema({
 })
 
 CustomerSchema.index({ customerof: 1, phone: 1 }, { unique: true });
-const Customer = mongoose.model(process.env.MONGODB_Customer_COLLECTION, CustomerSchema)
+const Customer = mongoose.model(process.env.MONGODB_CUSTOMER_COLLECTION, CustomerSchema)
 
 module.exports = Customer

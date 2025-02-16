@@ -3,7 +3,8 @@ const { User } = require("../Model/UserModels/Userschema")
 const jwt = require("jsonwebtoken")
 
 const Token_Verification = async (request, response,next) => {
-    const token = request.header("Authorization")
+    try {
+        const token = request.header("Authorization")
     if (!token) return Resopnse_Handler(response, 404, "Token not Found.")
     const User_Payload = jwt.verify(token, process.env.JWT_SECURITY_KEY)
     if (!User_Payload || !User_Payload.id) return Resopnse_Handler(response, 401, "Invalid token.")
@@ -15,6 +16,9 @@ const Token_Verification = async (request, response,next) => {
 
     request.user = User_Data
     next()
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error",null,error)
+    }
 }
 
 module.exports = Token_Verification
