@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Title from '../../CommonComponents/Title'
 import Footer from '../../CommonComponents/Footer'
+import InvoiceAddCustomerModal from './InvoiceAddCustomerModal'
+import InvoiceAddItemModal from './InvoiceAddItemModal'
 
 const NewInvoice = () => {
+    const [Customer_Toggle,Set_Customer_Toggle] = useState(false)
+    const [Item_Toggle,Set_Item_Toggle] = useState(false)
   return (
   <div className="main-content">
     <div className="page-content">
@@ -15,7 +19,7 @@ const NewInvoice = () => {
                             <div className="card-body border-bottom border-bottom-dashed p-4">
                                 <div className="row">
                                     <div className="col-lg-6">
-                                        <div className="row g-3">
+                                        {/* <div className="row g-3">
                                             <div className="col-lg-8 col-sm-6">
                                                 <label htmlFor="invoicenoInput">Invoice No</label>
                                                 <input type="text" className="form-control bg-light border-0" id="invoicenoInput" placeholder="Invoice No" defaultValue="#VL25000355" readOnly="readonly" />
@@ -31,7 +35,8 @@ const NewInvoice = () => {
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
+                                        <button type='button' id="add-item" onClick={()=>Set_Customer_Toggle(!Customer_Toggle)} className="btn btn-soft-secondary fw-medium"><i className="ri-add-fill me-1 align-bottom" /> Add Customer</button>
                                     </div>
                                     <div className="col-lg-6 col-sm-6">
                                         <div><label htmlFor="billingName" className="text-muted text-uppercase fw-semibold">Billing Address</label></div>
@@ -107,7 +112,7 @@ const NewInvoice = () => {
                                         <tbody>
                                             <tr id="newForm" style={{ display: 'none' }}><td className="d-none" colSpan={5}><p>Add New Form</p></td></tr>
                                             <tr>
-                                                <td colSpan={5}><a id="add-item" className="btn btn-soft-secondary fw-medium"><i className="ri-add-fill me-1 align-bottom" /> Add Item</a></td>
+                                                <td colSpan={5}><button type='button' id="add-item" onClick={()=>Set_Item_Toggle(!Item_Toggle)} className="btn btn-soft-secondary fw-medium"><i className="ri-add-fill me-1 align-bottom" /> Add Item</button></td>
                                             </tr>
                                             <tr className="border-top border-top-dashed mt-2">
                                                 <td colSpan={3} />
@@ -153,6 +158,8 @@ const NewInvoice = () => {
         </div>
     </div>
     <Footer/>
+    {Customer_Toggle && <InvoiceAddCustomerModal setToggle={Set_Customer_Toggle}/>}
+    {Item_Toggle && <InvoiceAddItemModal setToggle={Set_Item_Toggle}/>}
   </div>
   )
 }

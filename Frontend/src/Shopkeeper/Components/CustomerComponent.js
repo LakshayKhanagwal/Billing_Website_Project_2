@@ -101,7 +101,7 @@ const CustomerComponent = () => {
                                                                         <th scope="col" style={{ width: "20%" }}>Name</th>
                                                                         <th scope="col" style={{ width: "15%" }}>Phone</th>
                                                                         <th scope="col" style={{ width: "24%" }}>Address</th>
-                                                                        <th scope="col" style={{ width: '10%' }}>Balance</th>
+                                                                        <th scope="col" style={{ width: '10%' }}>Balance (₹)</th>
                                                                         <th scope="col" style={{ width: '8%' }}>Status</th>
                                                                         <th scope="col" style={{ width: '8%' }}>Action</th>
                                                                     </tr>
@@ -111,12 +111,12 @@ const CustomerComponent = () => {
                                                                         Updated_Customer_Data && Updated_Customer_Data.length > 0 ? Updated_Customer_Data.map((Customer, index) => {
                                                                             return (
                                                                                 <tr>
-                                                                                    <td>{index + 1}</td>
+                                                                                    <td>{Customer_Count?.First_Index + index}</td>
                                                                                     <td>{Customer.createdat ? new Date(Customer.createdat).toLocaleDateString('en-GB', { day: 'numeric', month: "short" }) : "-"}</td>
                                                                                     <td>{Customer.name}</td>
                                                                                     <td>{Customer.phone}</td>
                                                                                     <td>{Customer.address}</td>
-                                                                                    <td>{Customer.balance}</td>
+                                                                                    <td>₹ {Customer.balance}/-</td>
                                                                                     <td>{Customer.balance === 0 ? (<span className="badge bg-success-subtle text-success p-2">Paid</span>) : <span className="badge bg-danger-subtle text-danger p-2">Pending</span>}</td>
                                                                                     <td>
                                                                                         <div className="dropdown">
@@ -144,7 +144,9 @@ const CustomerComponent = () => {
                                                                                     </td>
                                                                                 </tr>
                                                                             )
-                                                                        }) : ""
+                                                                        }) : <tr>
+                                                                            <td colSpan={8}>No Customers to Display.</td>
+                                                                        </tr>
                                                                     }
                                                                 </tbody>
                                                             </table>
