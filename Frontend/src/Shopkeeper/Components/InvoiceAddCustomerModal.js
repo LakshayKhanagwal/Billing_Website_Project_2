@@ -8,12 +8,12 @@ const InvoiceAddCustomerModal = (props) => {
     const [Search_Phrase, Set_Search_Phrase] = useState([])
     const navigate = useNavigate()
 
-    useEffect(()=>{
-        if(Customers.length !== 0 ){
-            const data = Customers.filter(Customer_Data=>Customer_Data.name.includes(Search_Phrase) || Customer_Data.phone.includes(Search_Phrase))
+    useEffect(() => {
+        if (Customers.length !== 0) {
+            const data = Customers.filter(Customer_Data => Customer_Data.name.includes(Search_Phrase) || Customer_Data.phone.includes(Search_Phrase))
             Set_Searched_Customers(data)
         }
-    },[Search_Phrase])
+    }, [Search_Phrase])
 
     useEffect(() => {
         const Fatch_Customer_Helper = async () => {
@@ -57,11 +57,39 @@ const InvoiceAddCustomerModal = (props) => {
                                 <div className="col-lg-12">
                                     <form onSubmit={'/'} href="#" className="app-search me-2">
                                         <div className="position-relative">
-                                            <input type="text" onChange={(e)=>Set_Search_Phrase(e.target.value)} className="form-control custominputwidth" placeholder="Search..." autoComplete="off" />
+                                            <input type="text" onChange={(e) => Set_Search_Phrase(e.target.value)} className="form-control custominputwidth" placeholder="Search..." autoComplete="off" />
                                             <span className="las la-search search-widget-icon" />
                                             <span className="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none" />
                                         </div>
                                     </form>
+                                    {
+                                        Search_Phrase && Searched_Customers && Searched_Customers.length !== 0 && (
+                                            <table className='table table-bordered table-hover table-striped'>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sr no.</th>
+                                                        <th>Name</th>
+                                                        <th>Phone</th>
+                                                        <th>Balance</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {
+                                                        Searched_Customers?.map((Data_Customers,index)=>{
+                                                            return(
+                                                                <tr>
+                                                                    <td>{index+1}</td>
+                                                                    <td>{Data_Customers.name}</td>
+                                                                    <td>{Data_Customers.phone}</td>
+                                                                    <td>{Data_Customers.balance}</td>
+                                                                </tr>
+                                                            )
+                                                        })
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        )
+                                    }
                                 </div>
                             </div>
                         </div>

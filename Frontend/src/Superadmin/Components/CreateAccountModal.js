@@ -44,6 +44,7 @@ const CreateAccountModal = (props) => {
             const Users_All = await Users.json()
             if (Users.status === 202) return Set_Shopkeepers(Users_All.Data)
             alert(Users_All?.Message)
+            console.log(Users_All?.Message)
         } catch (error) {
             console.log(error)
         }
@@ -90,7 +91,6 @@ const CreateAccountModal = (props) => {
                 localStorage.clear()
                 window.history.replaceState(null, null, "/")
                 nevigate("/", { replace: true })
-                console.log("first")
             }
             const OTP_Validity = await fetch("http://localhost:3100/Api/Shopkeper_OTP_Verification", {
                 method: "post",
@@ -103,12 +103,8 @@ const CreateAccountModal = (props) => {
             const OTP_Validity_JSON = await OTP_Validity.json()
             alert(OTP_Validity_JSON?.Message)
 
-            if (OTP_Validity.status === 201) {
-                props.fun(false)
-                Set_Loading(false)
-            }else{
-                Set_Loading(false)
-            }
+            if (OTP_Validity.status === 201) return props.fun(false), props.All_Users(), Set_Loading(false);
+            Set_Loading(false)
         } catch (error) {
             console.log(error)
         }
