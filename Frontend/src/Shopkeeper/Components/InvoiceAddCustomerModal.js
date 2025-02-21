@@ -77,7 +77,7 @@ const InvoiceAddCustomerModal = (props) => {
                                                     {
                                                         Searched_Customers?.map((Data_Customers,index)=>{
                                                             return(
-                                                                <tr>
+                                                                <tr className='Cursor_hover' onClick={()=>{props.Set_Customer(Data_Customers);props.setToggle(false)}}>
                                                                     <td>{index+1}</td>
                                                                     <td>{Data_Customers.name}</td>
                                                                     <td>{Data_Customers.phone}</td>
