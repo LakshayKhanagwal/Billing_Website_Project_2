@@ -28,13 +28,13 @@ const AllProductsComponent = () => {
     }, [])
 
     useEffect(() => {
-        if (Product_Data.length !== 0) {
+        if (Product_Data?.length !== 0) {
             const Last_Product_Index = Current_Page * Products_Per_Page
             const First_Product_Index = Last_Product_Index - Products_Per_Page
-            const Current_VIsible_Products = Product_Data.slice(First_Product_Index, Last_Product_Index)
-            const Total_Page_Count = Math.ceil(Product_Data.length / Products_Per_Page)
+            const Current_VIsible_Products = Product_Data?.slice(First_Product_Index, Last_Product_Index)
+            const Total_Page_Count = Math.ceil(Product_Data?.length / Products_Per_Page)
 
-            Set_Product_Count({ First_Index: First_Product_Index + 1, Last_Index: Current_VIsible_Products.length + First_Product_Index, Total_Users: Product_Data.length })
+            Set_Product_Count({ First_Index: First_Product_Index + 1, Last_Index: Current_VIsible_Products?.length + First_Product_Index, Total_Users: Product_Data?.length })
             Set_Total_Pages(Total_Page_Count)
             Set_Updated_Product_Data(Current_VIsible_Products)
         }
@@ -43,6 +43,7 @@ const AllProductsComponent = () => {
     const Fatch_Users_Product = async (token) => {
         try {
             const User_Products = await fetch("http://localhost:3100/Api/Get_Products", {
+                method:"get",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": token
@@ -50,7 +51,7 @@ const AllProductsComponent = () => {
             })
             const User_Products_JSON = await User_Products.json()
             // alert(User_Products_JSON?.Message)
-            if (User_Products.status === 202) return Set_Product_Data(User_Products_JSON.All_Products)
+            if (User_Products.status === 202) return Set_Product_Data(User_Products_JSON.Data)
             alert(User_Products_JSON?.Message)
         } catch (error) {
             console.log(error)

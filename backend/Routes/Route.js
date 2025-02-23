@@ -173,10 +173,11 @@ const Validate_Product = (Product_object, schema) => {
 }
 
 Routes.post("/Add_Miltiple_Product", Token_Verification, async (request, response) => {
-    // try {
+    try {
         const { Product_Excel } = request.body
+
         if (!Array.isArray(Product_Excel) || Product_Excel.length === 0) return Resopnse_Handler(response, 400, "Invalid input Format.")
-console.log(Product_Excel)
+
         const Updated_Producl_Excel = Product_Excel.map(Product_Excel => { return { ...Product_Excel, userid: request.user._id } })
         const error = []
         Updated_Producl_Excel.map(async (Product_Data, index) => {
@@ -192,9 +193,9 @@ console.log(Product_Excel)
         const Product_Insert_ACK = await Product.insertMany(Updated_Producl_Excel)
         return Resopnse_Handler(response, 202, "Product Added Successfully.", Product_Insert_ACK)
 
-    // } catch (error) {
-    //     return Resopnse_Handler(response, 500, "Internal Server Error")
-    // }
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
+    }
 })
 
 Routes.get("/Get_Products", Token_Verification, async (request, response) => {
@@ -203,7 +204,7 @@ Routes.get("/Get_Products", Token_Verification, async (request, response) => {
 
         if (All_Products.length === 0) return Resopnse_Handler(response, 404, "Your product list is empty.")
 
-        return Resopnse_Handler(response, 404, "All Products fetched successfully.")
+        return Resopnse_Handler(response, 202, "All Products fetched successfully.",All_Products)
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
     }
@@ -346,7 +347,7 @@ Routes.get("/Create_Invoice/:id", Token_Verification, async (request, response) 
 
         const Invoice_Number = await Invoice_Number_Generator()
 
-        Complete_Invoice = await Invoice.create({InvoiceNo:Invoice_Number,OrderItems:All_ID,TotalAmount:Total_Amount,TotalTax:Total_Tax,TotalDiscount:Total_Discount,TotalProfit:Total_Profit,Subtotal:Total_Amount,customerId:id,shopkeeperId:request.User._id})
+        Complete_Invoice = await Invoice.create({ InvoiceNo: Invoice_Number, OrderItems: All_ID, TotalAmount: Total_Amount, TotalTax: Total_Tax, TotalDiscount: Total_Discount, TotalProfit: Total_Profit, Subtotal: Total_Amount, customerId: id, shopkeeperId: request.User._id })
 
         return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", Complete_Invoice.InvoiceNo)
 

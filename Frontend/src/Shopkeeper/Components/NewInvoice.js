@@ -9,7 +9,31 @@ const NewInvoice = () => {
     const [Customer_Details, Set_Customer_Details] = useState({})
     const [Item_Toggle, Set_Item_Toggle] = useState(false)
 
-    const Product_Selected=[]
+    const [Product_Selected, Set_Product_Selected] = useState([])
+    console.log(Product_Selected)
+    const Remove_Items = (Product_Data) => {
+        Set_Product_Selected(Product_Selected.filter(Product => Product._id !== Product_Data._id))
+    }
+
+    const Updated_Discount = (Updated_Discount_Value, Product_Data) => {
+        Product_Data.discount = Updated_Discount_Value
+        Set_Product_Selected(Product_Selected.filter(Product => Product._id === Product_Data._id ? Product_Data : Product))
+    }
+
+    const Add_Quantity = (Product_Data) => {
+        Product_Data.quantity += 1
+        Set_Product_Selected(Product_Selected.filter(Product => Product._id === Product_Data._id ? Product_Data : Product))
+    }
+
+    const Decrease_Quantity = (Product_Data) => {
+        if (Product_Data.quantity > 1) {
+            Product_Data.quantity -= 1
+            Set_Product_Selected(Product_Selected.filter(Product => Product._id === Product_Data._id ? Product_Data : Product))
+        } else {
+            Set_Product_Selected(Product_Selected.filter(Product => Product._id !== Product_Data._id))
+        }
+    }
+
     return (
         <div className="main-content">
             <div className="page-content">
@@ -72,52 +96,40 @@ const NewInvoice = () => {
                                                 </thead>
                                                 <tbody id="newlink">
                                                     {
-                                                        Product_Selected && Product_Selected.map((Product_Data, index) => {
-                                                            <tr id={1} className="product">
-                                                                <th scope="row" className="product-id">1</th>
+                                                        Product_Selected && Product_Selected?.map((Product_Data, index) => {
+                                                            return (<tr id={1} className="product">
+                                                                <th scope="row" className="product-id">{index + 1}</th>
                                                                 <td className="text-start">
                                                                     <div className="mb-2">
-                                                                        <input type="text" className="form-control bg-light border-0" id="productName-1" placeholder="Product Name" required />
-                                                                        <div className="invalid-feedback">
-                                                                            Please enter a product name
-                                                                        </div>
+                                                                        <input type="text" className="form-control bg-light border-0" id="productName-1" placeholder="Product Name" readOnly value={`${Product_Data.name}-${Product_Data.model}`} required />
                                                                     </div>
-                                                                    <textarea className="form-control bg-light border-0" id="productDetails-1" rows={2} placeholder="Product Details" defaultValue={""} />
+                                                                    <textarea className="form-control bg-light border-0" id="productDetails-1" rows={2} placeholder="Product Details" readOnly value={Product_Data.description} defaultValue={""} />
                                                                 </td>
                                                                 <td>
-                                                                    <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} required />
-                                                                    <div className="invalid-feedback">
-                                                                        Please enter a rate
-                                                                    </div>
+                                                                    <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} readOnly value={Product_Data.price} required />
                                                                 </td>
                                                                 <td>
                                                                     <div className="input-step">
-                                                                        <button type="button" className="minus">-</button>
-                                                                        <input type="number" className="product-quantity" id="product-qty-1" defaultValue={0} readOnly />
-                                                                        <button type="button" className="plus">+</button>
+                                                                        <button type="button" className="minus" onClick={() => Decrease_Quantity(Product_Data)}>-</button>
+                                                                        <input type="number" className="product-quantity" id="product-qty-1" defaultValue={0} readOnly value={Product_Data.quantity} />
+                                                                        <button type="button" className="plus" onClick={() => Add_Quantity(Product_Data)}>+</button>
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} required />
-                                                                    <div className="invalid-feedback">
-                                                                        Please enter a rate
-                                                                    </div>
+                                                                    <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} readOnly value={Product_Data.tax} required />
                                                                 </td>
                                                                 <td>
-                                                                    <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} required />
-                                                                    <div className="invalid-feedback">
-                                                                        Please enter a rate
-                                                                    </div>
+                                                                    <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} onChange={(e) => Updated_Discount(e.target.value, Product_Data)} value={Product_Data.discount} required />
                                                                 </td>
                                                                 <td className="text-end">
                                                                     <div>
-                                                                        <input type="text" className="form-control bg-light border-0 product-line-price" id="productPrice-1" placeholder="$0.00" readOnly />
+                                                                        <input type="text" className="form-control bg-light border-0 product-line-price" id="productPrice-1" placeholder="$0.00" readOnly value={Product_Data.price * Product_Data.quantity} />
                                                                     </div>
                                                                 </td>
                                                                 <td className="product-removal">
-                                                                    <a className="btn btn-success">Delete</a>
+                                                                    <a className="btn btn-success" onClick={() => Remove_Items(Product_Data)}>Delete</a>
                                                                 </td>
-                                                            </tr>
+                                                            </tr>)
                                                         })
                                                     }
                                                     {/* <tr id={1} className="product">
@@ -216,7 +228,7 @@ const NewInvoice = () => {
             </div>
             <Footer />
             {Customer_Toggle && <InvoiceAddCustomerModal setToggle={Set_Customer_Toggle} Set_Customer={Set_Customer_Details} />}
-            {Item_Toggle && <InvoiceAddItemModal setToggle={Set_Item_Toggle} Set_Product={Product_Selected} />}
+            {Item_Toggle && <InvoiceAddItemModal setToggle={Set_Item_Toggle} Set_Product={Set_Product_Selected} Get_Product={Product_Selected} />}
         </div>
     )
 }

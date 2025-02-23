@@ -9,7 +9,7 @@ const InvoiceAddItemModal = (props) => {
 
     useEffect(() => {
         if (Product.length !== 0) {
-            const data = Product.filter(Product_Data => Product_Data.name.includes(Search_Phrase) || Product_Data.phone.includes(Search_Phrase))
+            const data = Product.filter(Product_Data => Product_Data?.name?.includes(Search_Phrase) || Product_Data?.company?.includes(Search_Phrase))
             Set_Searched_Product(data)
         }
     }, [Search_Phrase])
@@ -40,9 +40,6 @@ const InvoiceAddItemModal = (props) => {
             console.log(error)
         }
     }
-    console.log(Product)
-    console.log(Search_Phrase)
-    console.log(Searched_Product)
 
     return (
         <div>
@@ -59,7 +56,7 @@ const InvoiceAddItemModal = (props) => {
                                 <div className="col-lg-12">
                                     <form onSubmit={'/'} href="#" className="app-search me-2">
                                         <div className="position-relative">
-                                            <input type="text" onChange={(e) => Set_Search_Phrase(e.target.value)} className="form-control custominputwidth" placeholder="Search..." autoComplete="off" />
+                                            <input type="text" onChange={(e) => Set_Search_Phrase(e.target.value)} className="form-control custominputwidth" placeholder="Search..." autoFocus autoComplete="off" />
                                             <span className="las la-search search-widget-icon" />
                                             <span className="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none" />
                                         </div>
@@ -71,19 +68,23 @@ const InvoiceAddItemModal = (props) => {
                                                     <tr>
                                                         <th>Sr no.</th>
                                                         <th>Name</th>
-                                                        <th>Phone</th>
-                                                        <th>Balance</th>
+                                                        <th>Company</th>
+                                                        <th>Price</th>
+                                                        <th>Tax</th>
+                                                        <th>Discount</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {
                                                         Searched_Product?.map((Data_Product, index) => {
                                                             return (
-                                                                <tr className='Cursor_hover' onClick={() => { props.Set_Product.push(Data_Product); props.setToggle(false) }}>
+                                                                <tr className='Cursor_hover' onClick={() => { props.Set_Product([...props.Get_Product,{...Data_Product,"quantity":1}]); props.setToggle(false) }}>
                                                                     <td>{index + 1}</td>
-                                                                    <td>{Data_Product.name}</td>
-                                                                    <td>{Data_Product.phone}</td>
-                                                                    <td>{Data_Product.balance}</td>
+                                                                    <td>{Data_Product.name}-{Data_Product.model}</td>
+                                                                    <td>{Data_Product.company}</td>
+                                                                    <td>{Data_Product.price}/-</td>
+                                                                    <td>{Data_Product.tax}%</td>
+                                                                    <td>{Data_Product.discount}%</td>
                                                                 </tr>
                                                             )
                                                         })

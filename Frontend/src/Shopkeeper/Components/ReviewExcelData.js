@@ -70,6 +70,7 @@ const ReviewExcelData = ({ Product_Excel, Set_Product_Excel }) => {
                 }
             })
             const Users_All = await Users.json()
+            console.log(Users_All)
             alert(Users_All?.Message)
             if (Users.status === 202) return navigate("/AllProducts")
 
