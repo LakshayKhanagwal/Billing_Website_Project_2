@@ -10,7 +10,7 @@ const Token_Verification = require('../MiddleWares/TokenVerification')
 const Customer = require("../Model/CustomerModels/CustomerSchema")
 const { default: mongoose } = require('mongoose')
 const OrderedItems = require('../Model/OrderedItemsModel/OrderedItemsSchema')
-const { Invoice } = require('../Model/TransectionModel/TransectionSchema')
+const { Invoice, Transaction } = require('../Model/TransectionModel/TransectionSchema')
 
 Routes.get("/", async (request, response) => {
     return response.status(200).json({ message: "Server Health is Fine." })
@@ -200,11 +200,11 @@ Routes.post("/Add_Miltiple_Product", Token_Verification, async (request, respons
 
 Routes.get("/Get_Products", Token_Verification, async (request, response) => {
     try {
-        const All_Products = await Product.find({ userid: request.user._id }).select("-userid")
+        const All_Products = await Product.find({ userid: request.user._id }).select("-userid -__v")
 
         if (All_Products.length === 0) return Resopnse_Handler(response, 404, "Your product list is empty.")
 
-        return Resopnse_Handler(response, 202, "All Products fetched successfully.",All_Products)
+        return Resopnse_Handler(response, 202, "All Products fetched successfully.", All_Products)
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error")
     }
@@ -280,16 +280,11 @@ Routes.get("/Get_All_Customer", Token_Verification, async (request, response) =>
     }
 })
 
-const Validate_Ordered_Items = (items, schema) => {
-    const Schema_Keys = Object.keys(schema.paths).filter((key) => key !== "__v" && key !== "_id" && key !== "createdat" && key !== "subtotal")
-    const Items_Keys = Object.keys(items)
-    for (let key of Schema_Keys) {
-        if (!Items_Keys.hasOwnProperty(key) || items[key] === null || items[key] === "") return "key " + key + " is missing."
-    }
+const Validate_Ordered_Items = (items) => {
+    if (Object.keys(items).length === 0) return "Product Detail not found.";
+    if (!items.id || items.id === "" || items.id == null || !mongoose.isValidObjectId(items.id)) return "Product id is invalid.";
+    if (!items.quantity || items.quantity === "" || items.quantity === null || items.quantity <= 0) return "Product quantity is invalid.";
 
-    for (let key of Items_Keys) {
-        if (!Schema_Keys.includes(key)) return "key " + key + " is invalid or extra."
-    }
     return null
 }
 
@@ -305,7 +300,7 @@ const Invoice_Number_Generator = async (Invoice_Number) => {
     return New_Invoice_Number
 }
 
-Routes.get("/Create_Invoice/:id", Token_Verification, async (request, response) => {
+Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response) => {
     try {
         const { id } = request.params
         if (!id || !mongoose.isValidObjectId(id)) return Resopnse_Handler(response, 404, "It's Not a Valid Customer.")
@@ -314,12 +309,13 @@ Routes.get("/Create_Invoice/:id", Token_Verification, async (request, response) 
         if (!Existing_Customer) return Resopnse_Handler(response, 404, "Customer Not Found.")
 
         const { Ordered_Items } = request.body
+
         if (!Ordered_Items) return Resopnse_Handler(response, 404, "Please Select a Product.")
         if (!Array.isArray(Ordered_Items) || Ordered_Items.length === 0) return Resopnse_Handler(response, 404, "Invalid Item Input Style.")
 
         const error = []
         Ordered_Items.map(async (Items, index) => {
-            const Validation_Error = Validate_Ordered_Items(Items, Ordered_Items.schema)
+            const Validation_Error = Validate_Ordered_Items(Items)
             if (Validation_Error) error.push({ index, error: Validation_Error })
         })
         if (error.length > 0) return Resopnse_Handler(response, 404, "Validation Error.", null, error)
@@ -341,18 +337,18 @@ Routes.get("/Create_Invoice/:id", Token_Verification, async (request, response) 
             Total_Profit += profit
         })
 
-        const Orders_ACK = OrderedItems.insertMany(OrderedItems)
+        const Orders_ACK = OrderedItems.insertMany(Ordered_Items)
 
         const All_ID = (await Orders_ACK).map(ord => ord._id)
 
         const Invoice_Number = await Invoice_Number_Generator()
-
-        Complete_Invoice = await Invoice.create({ InvoiceNo: Invoice_Number, OrderItems: All_ID, TotalAmount: Total_Amount, TotalTax: Total_Tax, TotalDiscount: Total_Discount, TotalProfit: Total_Profit, Subtotal: Total_Amount, customerId: id, shopkeeperId: request.User._id })
+        const User_id = request.user._id
+        Complete_Invoice = await Invoice.create({ InvoiceNo: Invoice_Number, OrderItems: All_ID, TotalAmount: Total_Amount, TotalTax: Total_Tax, TotalDiscount: Total_Discount, TotalProfit: Total_Profit, Subtotal: Total_Amount, customerId: id, shopkeeperId: User_id })
 
         return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", Complete_Invoice.InvoiceNo)
 
     } catch (error) {
-        return Resopnse_Handler(response, 500, "Internal Server Error")
+        return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
     }
 })
 

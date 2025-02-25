@@ -3,13 +3,15 @@ import Title from '../../CommonComponents/Title'
 import Footer from '../../CommonComponents/Footer'
 import InvoiceAddCustomerModal from './InvoiceAddCustomerModal'
 import InvoiceAddItemModal from './InvoiceAddItemModal'
+import { useNavigate } from 'react-router-dom'
 
 const NewInvoice = () => {
     const [Customer_Toggle, Set_Customer_Toggle] = useState(false)
     const [Customer_Details, Set_Customer_Details] = useState({})
     const [Item_Toggle, Set_Item_Toggle] = useState(false)
     const [Product_Selected, Set_Product_Selected] = useState([])
-    const [Price_Details, Set_Price_Details] = useState([])
+    const [Price_Details, Set_Price_Details] = useState({})
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (Product_Selected.length !== 0) {
@@ -17,13 +19,15 @@ const NewInvoice = () => {
             let Tax_Total = 0
             let Discount_Total = 0
 
-            Product_Selected?.map((Product) => {
+            Product_Selected?.map(async (Product) => {
                 Sub_Total += parseFloat((Product.quantity * Product.price).toFixed(2))
                 Tax_Total += parseFloat((Product.quantity * (((Product.price - ((Product.price * Product.discount) / 100)) * Product.tax) / 100)).toFixed(2))
                 Discount_Total += parseFloat((Product.quantity * ((Product.price * Product.discount) / 100)).toFixed(2))
             })
             const Amount_Total = parseFloat((Sub_Total + Tax_Total - Discount_Total).toFixed(2))
-            Set_Price_Details({ Amount_Total, Sub_Total, Tax_Total, Discount_Total })
+            return Set_Price_Details({ Amount_Total, Sub_Total, Tax_Total, Discount_Total })
+        } else {
+            return Set_Price_Details({})
         }
     }, [Product_Selected])
 
@@ -50,6 +54,34 @@ const NewInvoice = () => {
         }
     }
 
+    const Save_Invoice = async (e) => {
+        try {
+            e.preventDefault()
+            const User_Data = JSON.parse(localStorage.getItem("User_Data"))
+            if (!User_Data || !User_Data.Authorization_Token) {
+                localStorage.clear()
+                window.history.replaceState(null, null, "/")
+                navigate("/", { replace: true })
+            }
+            if (!Customer_Details._id) return alert("Please Select Customer.")
+            if (Product_Selected.length === 0) return alert("Please Add Product First.")
+
+            const Updated_Product_Selected = Product_Selected.map(({ _id, stock, ...Product }) => ({ ...Product, id: _id }))
+            const Invoice_ACK = await fetch("http://localhost:3100/Api/Create_Invoice/" + Customer_Details._id, {
+                method: "post",
+                body: JSON.stringify({ Ordered_Items: Updated_Product_Selected }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": User_Data.Authorization_Token
+                }
+            })
+            const Invoice_ACK_JSON = await Invoice_ACK.json()
+            console.log(Invoice_ACK_JSON)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <div className="main-content">
             <div className="page-content">
@@ -58,7 +90,7 @@ const NewInvoice = () => {
                     <div className="row justify-content-center">
                         <div className="col-xxl-9">
                             <div className="card">
-                                <form className="needs-validation" noValidate id="invoice_form">
+                                <form onSubmit={Save_Invoice} className="needs-validation" noValidate id="invoice_form">
                                     <div className="card-body border-bottom border-bottom-dashed p-4">
                                         <div className="row">
                                             <div className="col-lg-6">
@@ -161,19 +193,19 @@ const NewInvoice = () => {
                                                                 <tbody>
                                                                     <tr>
                                                                         <th scope="row">Sub Total</th>
-                                                                        <td style={{ width: 150 }}><input type="text" className="form-control bg-light border-0" id="cart-subtotal" placeholder="₹0.00" value={Price_Details?.Sub_Total} readOnly /></td>
+                                                                        <td style={{ width: 150 }}><input type="text" className="form-control bg-light border-0" id="cart-subtotal" placeholder="₹0.00" value={Price_Details?.Sub_Total ? Price_Details.Sub_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th scope="row">Estimated Tax (15%)</th>
-                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-tax" placeholder="₹0.00" value={Price_Details?.Tax_Total} readOnly /></td>
+                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-tax" placeholder="₹0.00" value={Price_Details?.Tax_Total ? Price_Details?.Tax_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th scope="row">Discount <small className="text-muted">(QuickBill-10%)</small></th>
-                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-discount" placeholder="₹0.00" value={Price_Details?.Discount_Total} readOnly /></td>
+                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-discount" placeholder="₹0.00" value={Price_Details?.Discount_Total ? Price_Details?.Discount_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                     <tr className="border-top border-top-dashed">
                                                                         <th scope="row">Total Amount</th>
-                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-total" placeholder="₹0.00" value={Price_Details?.Amount_Total} readOnly /></td>
+                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-total" placeholder="₹0.00" value={Price_Details?.Amount_Total ? Price_Details?.Amount_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
@@ -188,7 +220,7 @@ const NewInvoice = () => {
                                         </div>
                                         <div className="hstack gap-2 justify-content-end d-print-none mt-4">
                                             <button type="submit" className="btn btn-info"><i className="ri-printer-line align-bottom me-1" /> Save Invoice</button>
-                                            <a className="btn btn-danger"><i className="ri-send-plane-fill align-bottom me-1" />Discard</a>
+                                            <span className="btn btn-danger Cursor_hover" onClick={()=> window.location.reload()}><i className="ri-send-plane-fill align-bottom me-1" />Discard</span>
                                         </div>
                                     </div>
                                 </form>
