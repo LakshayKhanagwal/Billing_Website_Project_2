@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from '../../CommonComponents/Title'
 import Footer from '../../CommonComponents/Footer'
 import InvoiceAddCustomerModal from './InvoiceAddCustomerModal'
@@ -8,9 +8,25 @@ const NewInvoice = () => {
     const [Customer_Toggle, Set_Customer_Toggle] = useState(false)
     const [Customer_Details, Set_Customer_Details] = useState({})
     const [Item_Toggle, Set_Item_Toggle] = useState(false)
-
     const [Product_Selected, Set_Product_Selected] = useState([])
-    console.log(Product_Selected)
+    const [Price_Details, Set_Price_Details] = useState([])
+
+    useEffect(() => {
+        if (Product_Selected.length !== 0) {
+            let Sub_Total = 0
+            let Tax_Total = 0
+            let Discount_Total = 0
+
+            Product_Selected?.map((Product) => {
+                Sub_Total += parseFloat((Product.quantity * Product.price).toFixed(2))
+                Tax_Total += parseFloat((Product.quantity * (((Product.price - ((Product.price * Product.discount) / 100)) * Product.tax) / 100)).toFixed(2))
+                Discount_Total += parseFloat((Product.quantity * ((Product.price * Product.discount) / 100)).toFixed(2))
+            })
+            const Amount_Total = parseFloat((Sub_Total + Tax_Total - Discount_Total).toFixed(2))
+            Set_Price_Details({ Amount_Total, Sub_Total, Tax_Total, Discount_Total })
+        }
+    }, [Product_Selected])
+
     const Remove_Items = (Product_Data) => {
         Set_Product_Selected(Product_Selected.filter(Product => Product._id !== Product_Data._id))
     }
@@ -123,7 +139,7 @@ const NewInvoice = () => {
                                                                 </td>
                                                                 <td className="text-end">
                                                                     <div>
-                                                                        <input type="text" className="form-control bg-light border-0 product-line-price" id="productPrice-1" placeholder="$0.00" readOnly value={Product_Data.price * Product_Data.quantity} />
+                                                                        <input type="text" className="form-control bg-light border-0 product-line-price" id="productPrice-1" placeholder="₹0.00" readOnly value={Product_Data.price * Product_Data.quantity} />
                                                                     </div>
                                                                 </td>
                                                                 <td className="product-removal">
@@ -132,51 +148,6 @@ const NewInvoice = () => {
                                                             </tr>)
                                                         })
                                                     }
-                                                    {/* <tr id={1} className="product">
-                                                        <th scope="row" className="product-id">1</th>
-                                                        <td className="text-start">
-                                                            <div className="mb-2">
-                                                                <input type="text" className="form-control bg-light border-0" id="productName-1" placeholder="Product Name" required />
-                                                                <div className="invalid-feedback">
-                                                                    Please enter a product name
-                                                                </div>
-                                                            </div>
-                                                            <textarea className="form-control bg-light border-0" id="productDetails-1" rows={2} placeholder="Product Details" defaultValue={""} />
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} required />
-                                                            <div className="invalid-feedback">
-                                                                Please enter a rate
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div className="input-step">
-                                                                <button type="button" className="minus">-</button>
-                                                                <input type="number" className="product-quantity" id="product-qty-1" defaultValue={0} readOnly />
-                                                                <button type="button" className="plus">+</button>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} required />
-                                                            <div className="invalid-feedback">
-                                                                Please enter a rate
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" className="form-control product-price bg-light border-0" id="productRate-1" step="0.01" placeholder={0.00} required />
-                                                            <div className="invalid-feedback">
-                                                                Please enter a rate
-                                                            </div>
-                                                        </td>
-                                                        <td className="text-end">
-                                                            <div>
-                                                                <input type="text" className="form-control bg-light border-0 product-line-price" id="productPrice-1" placeholder="$0.00" readOnly />
-                                                            </div>
-                                                        </td>
-                                                        <td className="product-removal">
-                                                            <a className="btn btn-success">Delete</a>
-                                                        </td>
-                                                    </tr> */}
                                                 </tbody>
                                                 <tbody>
                                                     <tr id="newForm" style={{ display: 'none' }}><td className="d-none" colSpan={5}><p>Add New Form</p></td></tr>
@@ -190,19 +161,19 @@ const NewInvoice = () => {
                                                                 <tbody>
                                                                     <tr>
                                                                         <th scope="row">Sub Total</th>
-                                                                        <td style={{ width: 150 }}><input type="text" className="form-control bg-light border-0" id="cart-subtotal" placeholder="$0.00" readOnly /></td>
+                                                                        <td style={{ width: 150 }}><input type="text" className="form-control bg-light border-0" id="cart-subtotal" placeholder="₹0.00" value={Price_Details?.Sub_Total} readOnly /></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th scope="row">Estimated Tax (15%)</th>
-                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-tax" placeholder="$0.00" readOnly /></td>
+                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-tax" placeholder="₹0.00" value={Price_Details?.Tax_Total} readOnly /></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th scope="row">Discount <small className="text-muted">(QuickBill-10%)</small></th>
-                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-discount" placeholder="$0.00" readOnly /></td>
+                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-discount" placeholder="₹0.00" value={Price_Details?.Discount_Total} readOnly /></td>
                                                                     </tr>
                                                                     <tr className="border-top border-top-dashed">
                                                                         <th scope="row">Total Amount</th>
-                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-total" placeholder="$0.00" readOnly /></td>
+                                                                        <td><input type="text" className="form-control bg-light border-0" id="cart-total" placeholder="₹0.00" value={Price_Details?.Amount_Total} readOnly /></td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
