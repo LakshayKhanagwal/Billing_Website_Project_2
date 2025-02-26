@@ -5,12 +5,13 @@ import InvoiceAddCustomerModal from './InvoiceAddCustomerModal'
 import InvoiceAddItemModal from './InvoiceAddItemModal'
 import { useNavigate } from 'react-router-dom'
 
-const NewInvoice = () => {
+const NewInvoice = (props) => {
     const [Customer_Toggle, Set_Customer_Toggle] = useState(false)
     const [Customer_Details, Set_Customer_Details] = useState({})
     const [Item_Toggle, Set_Item_Toggle] = useState(false)
     const [Product_Selected, Set_Product_Selected] = useState([])
     const [Price_Details, Set_Price_Details] = useState({})
+    const [Loading, Set_Loading] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -57,6 +58,7 @@ const NewInvoice = () => {
     const Save_Invoice = async (e) => {
         try {
             e.preventDefault()
+            Set_Loading(true)
             const User_Data = JSON.parse(localStorage.getItem("User_Data"))
             if (!User_Data || !User_Data.Authorization_Token) {
                 localStorage.clear()
@@ -76,7 +78,9 @@ const NewInvoice = () => {
                 }
             })
             const Invoice_ACK_JSON = await Invoice_ACK.json()
-            console.log(Invoice_ACK_JSON)
+            alert(Invoice_ACK_JSON.Message, Invoice_ACK)
+            if (Invoice_ACK.status === 202) return props.Set_Invoice(Invoice_ACK_JSON.Data)
+            Set_Loading(false)
         } catch (error) {
             console.log(error)
         }
@@ -111,7 +115,7 @@ const NewInvoice = () => {
                                                 </div>
                                             </div>
                                         </div> */}
-                                                <button type='button' id="add-item" onClick={() => Set_Customer_Toggle(!Customer_Toggle)} className="btn btn-soft-secondary fw-medium"><i className="ri-add-fill me-1 align-bottom" /> {Customer_Details?.name ? "Change Customer" : "Add Customer"}</button>
+                                                <button type='button' id="add-item" disabled={Loading} onClick={() => Set_Customer_Toggle(!Customer_Toggle)} className="btn btn-soft-secondary fw-medium"><i className="ri-add-fill me-1 align-bottom" /> {Customer_Details?.name ? "Change Customer" : "Add Customer"}</button>
                                             </div>
                                             <div className="col-lg-6 col-sm-6">
                                                 <div><label htmlFor="billingName" className="text-muted text-uppercase fw-semibold">Billing Address</label></div>
@@ -175,7 +179,7 @@ const NewInvoice = () => {
                                                                     </div>
                                                                 </td>
                                                                 <td className="product-removal">
-                                                                    <a className="btn btn-success" onClick={() => Remove_Items(Product_Data)}>Delete</a>
+                                                                    <a className="btn btn-success" disabled={Loading} onClick={() => Remove_Items(Product_Data)}>Delete</a>
                                                                 </td>
                                                             </tr>)
                                                         })
@@ -219,8 +223,8 @@ const NewInvoice = () => {
                                             <textarea className="form-control alert alert-info" id="exampleFormControlTextarea1" placeholder="Notes" rows={2} required defaultValue={"All accounts are to be paid within 7 days from receipt of invoice. To be paid by cheque or credit card or direct payment online. If account is not paid within 7 days the credits details supplied as confirmation of work undertaken will be charged the agreed quoted fee noted above."} />
                                         </div>
                                         <div className="hstack gap-2 justify-content-end d-print-none mt-4">
-                                            <button type="submit" className="btn btn-info"><i className="ri-printer-line align-bottom me-1" /> Save Invoice</button>
-                                            <span className="btn btn-danger Cursor_hover" onClick={()=> window.location.reload()}><i className="ri-send-plane-fill align-bottom me-1" />Discard</span>
+                                            <button type="submit" disabled={Loading} className="btn btn-info"><i className="ri-printer-line align-bottom me-1" /> {Loading ? "Generating...." : "Save Invoice"}</button>
+                                            <span className="btn btn-danger Cursor_hover" disabled={Loading} onClick={() => window.location.reload()}><i className="ri-send-plane-fill align-bottom me-1" />Discard</span>
                                         </div>
                                     </div>
                                 </form>

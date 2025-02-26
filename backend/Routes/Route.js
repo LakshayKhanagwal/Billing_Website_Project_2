@@ -288,11 +288,11 @@ const Validate_Ordered_Items = (items) => {
     return null
 }
 
-const Invoice_Number_Generator = async (Invoice_Number) => {
+const Invoice_Number_Generator = async () => {
     const Last_Invoice = await Invoice.findOne().sort({ _id: -1 })
     let New_Invoice_Number;
     if (Last_Invoice) {
-        let Last_Number = parseInt(Last_Invoice.Invoice_Number.split('-')[1]) + 1
+        let Last_Number = parseInt(Last_Invoice.InvoiceNo.split('-')[1]) + 1
         New_Invoice_Number = `INV-${Last_Number.toString().padStart(5, '0')}`
     } else {
         New_Invoice_Number = 'INV-00001'
@@ -344,8 +344,8 @@ Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response)
         const Invoice_Number = await Invoice_Number_Generator()
         const User_id = request.user._id
         Complete_Invoice = await Invoice.create({ InvoiceNo: Invoice_Number, OrderItems: All_ID, TotalAmount: Total_Amount, TotalTax: Total_Tax, TotalDiscount: Total_Discount, TotalProfit: Total_Profit, Subtotal: Total_Amount, customerId: id, shopkeeperId: User_id })
-
-        return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", Complete_Invoice.InvoiceNo)
+        const Final_Ordered_Items = await OrderedItems.find({_id:{$in:All_ID}})
+        return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", {Final_Ordered_Items,Complete_Invoice})
 
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error", null, error)

@@ -2,8 +2,9 @@ import React from 'react'
 import Footer from '../../CommonComponents/Footer'
 import Title from '../../CommonComponents/Title'
 
-const InvoiceDetails = () => {
-  return (
+const InvoiceDetails = (props) => {
+    console.log(props.Invoice)
+    return (
     <div className="main-content">
     <div className="page-content">
         <div className="container-fluid">
