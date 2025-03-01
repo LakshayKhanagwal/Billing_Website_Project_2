@@ -65,8 +65,8 @@ const NewInvoice = (props) => {
                 window.history.replaceState(null, null, "/")
                 navigate("/", { replace: true })
             }
-            if (!Customer_Details._id) return alert("Please Select Customer.")
-            if (Product_Selected.length === 0) return alert("Please Add Product First.")
+            if (!Customer_Details._id) return alert("Please Select Customer."), Set_Loading(false)
+            if (Product_Selected.length === 0) return alert("Please Add Product First."), Set_Loading(false)
 
             const Updated_Product_Selected = Product_Selected.map(({ _id, stock, ...Product }) => ({ ...Product, id: _id }))
             const Invoice_ACK = await fetch("http://localhost:3100/Api/Create_Invoice/" + Customer_Details._id, {

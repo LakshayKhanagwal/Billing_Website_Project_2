@@ -305,7 +305,7 @@ Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response)
         const { id } = request.params
         if (!id || !mongoose.isValidObjectId(id)) return Resopnse_Handler(response, 404, "It's Not a Valid Customer.")
 
-        const Existing_Customer = Customer.findOne({ _id: id })
+        const Existing_Customer = await Customer.findOne({ _id: id })
         if (!Existing_Customer) return Resopnse_Handler(response, 404, "Customer Not Found.")
 
         const { Ordered_Items } = request.body
@@ -344,9 +344,22 @@ Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response)
         const Invoice_Number = await Invoice_Number_Generator()
         const User_id = request.user._id
         Complete_Invoice = await Invoice.create({ InvoiceNo: Invoice_Number, OrderItems: All_ID, TotalAmount: Total_Amount, TotalTax: Total_Tax, TotalDiscount: Total_Discount, TotalProfit: Total_Profit, Subtotal: Total_Amount, customerId: id, shopkeeperId: User_id })
-        const Final_Ordered_Items = await OrderedItems.find({_id:{$in:All_ID}})
-        return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", {Final_Ordered_Items,Complete_Invoice})
+        const Final_Ordered_Items = await OrderedItems.find({ _id: { $in: All_ID } })
+        return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", { Final_Ordered_Items, Complete_Invoice })
+    } catch (error) {
+        return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
+    }
+})
 
+Routes.post("/Data_For_Invoice_PDF", Token_Verification, async (request, response) => {
+    try {
+        const { id } = request.body
+        const Shopkeeper = await User.findOne({ _id: request.user._id }).select("name phone email address -_id")
+        if (!Shopkeeper) return Resopnse_Handler(response, 404, "Invaild ShopKeeper.")
+        const Customer_Data = await Customer.findOne({ _id: id }).select("name phone email address balance -_id")
+        if (!Customer_Data) return Resopnse_Handler(response, 404, "Invaild Customer.")
+
+        return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", { Shopkeeper,Customer_Data })
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
     }

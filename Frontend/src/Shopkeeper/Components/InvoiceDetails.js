@@ -15,11 +15,11 @@ const InvoiceDetails = (props) => {
                         <div className="card-body">
                             <div className="row p-4">
                                 <div className="col-lg-9">
-                                    <h3 className="fw-bold mb-4">Invoice: Lezeco-00335 </h3>
+                                    <h3 className="fw-bold mb-4">Invoice: das </h3>
                                     <div className="row g-4">
                                         <div className="col-lg-6 col-6">
                                             <p className="text-muted mb-1 text-uppercase fw-medium fs-14">Invoice No</p>
-                                            <h5 className="fs-16 mb-0">#VL<span id="invoice-no">25000355</span></h5>
+                                            <h5 className="fs-16 mb-0">#<span id="invoice-no">asd</span></h5>
                                         </div>
                                         <div className="col-lg-6 col-6">
                                             <p className="text-muted mb-1 text-uppercase fw-medium fs-14">Date</p>
@@ -31,7 +31,7 @@ const InvoiceDetails = (props) => {
                                         </div>
                                         <div className="col-lg-6 col-6">
                                             <p className="text-muted mb-1 text-uppercase fw-medium fs-14">Total Amount</p>
-                                            <h5 className="fs-16 mb-0">$<span id="total-amount">755.96</span></h5>
+                                            <h5 className="fs-16 mb-0">₹<span id="total-amount">ads</span></h5>
                                         </div>
                                     </div>
                                 </div>
