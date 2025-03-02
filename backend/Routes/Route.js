@@ -326,10 +326,10 @@ Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response)
         let Total_Amount = 0
 
         Ordered_Items.map(item => {
-            const tax = ((item.price * item.tax) / 100) * item.quantity
-            const discount = ((item.price * item.discount) / 100) * item.quantity
-            item.subtotal = (item.price * item.quantity) + tax - discount
-            const profit = item.subtotal - tax - discount - (item.rate * item.quantity)
+            const tax = ((item.price * item.tax) / 100) * item.quantity.toFixed(2)
+            const discount = ((item.price * item.discount) / 100) * item.quantity.toFixed(2)
+            item.subtotal = (item.price * item.quantity) + tax - discount.toFixed(2)
+            const profit = item.subtotal - tax - discount - (item.rate * item.quantity).toFixed(2)
 
             Total_Tax += tax
             Total_Discount += discount
@@ -359,7 +359,7 @@ Routes.post("/Data_For_Invoice_PDF", Token_Verification, async (request, respons
         const Customer_Data = await Customer.findOne({ _id: id }).select("name phone email address balance -_id")
         if (!Customer_Data) return Resopnse_Handler(response, 404, "Invaild Customer.")
 
-        return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", { Shopkeeper,Customer_Data })
+        return Resopnse_Handler(response, 202, "Data Fetched Successfully..", { Shopkeeper,Customer_Data })
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
     }

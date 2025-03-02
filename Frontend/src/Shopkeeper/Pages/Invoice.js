@@ -10,7 +10,7 @@ const Invoice = () => {
       <ShopkeeperHeader />
       console.log(Invoice_Data)
       {
-        Invoice_Data.Complete_Invoice ? <InvoiceDetails Invoice={Invoice_Data} /> : <NewInvoice Set_Invoice={Set_Invoice_Data} />
+        Invoice_Data.Complete_Invoice ? <InvoiceDetails Invoice={Invoice_Data} Set_Invoice={Set_Invoice_Data} /> : <NewInvoice Set_Invoice={Set_Invoice_Data} />
       }
 
 

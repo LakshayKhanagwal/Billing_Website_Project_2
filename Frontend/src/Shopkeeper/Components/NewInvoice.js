@@ -200,11 +200,11 @@ const NewInvoice = (props) => {
                                                                         <td style={{ width: 150 }}><input type="text" className="form-control bg-light border-0" id="cart-subtotal" placeholder="₹0.00" value={Price_Details?.Sub_Total ? Price_Details.Sub_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <th scope="row">Estimated Tax (15%)</th>
+                                                                        <th scope="row">Estimated Tax</th>
                                                                         <td><input type="text" className="form-control bg-light border-0" id="cart-tax" placeholder="₹0.00" value={Price_Details?.Tax_Total ? Price_Details?.Tax_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <th scope="row">Discount <small className="text-muted">(QuickBill-10%)</small></th>
+                                                                        <th scope="row">Discount</th>
                                                                         <td><input type="text" className="form-control bg-light border-0" id="cart-discount" placeholder="₹0.00" value={Price_Details?.Discount_Total ? Price_Details?.Discount_Total : ""} readOnly /></td>
                                                                     </tr>
                                                                     <tr className="border-top border-top-dashed">
