@@ -21,9 +21,9 @@ const NewInvoice = (props) => {
             let Discount_Total = 0
 
             Product_Selected?.map(async (Product) => {
-                Sub_Total += parseFloat((Product.quantity * Product.price).toFixed(2))
-                Tax_Total += parseFloat((Product.quantity * (((Product.price - ((Product.price * Product.discount) / 100)) * Product.tax) / 100)).toFixed(2))
                 Discount_Total += parseFloat((Product.quantity * ((Product.price * Product.discount) / 100)).toFixed(2))
+                Tax_Total += parseFloat((Product.quantity * (((Product.price - ((Product.price * Product.discount) / 100)) * Product.tax) / 100)).toFixed(2))
+                Sub_Total += parseFloat((Product.price* Product.quantity  ).toFixed(2))
             })
             const Amount_Total = parseFloat((Sub_Total + Tax_Total - Discount_Total).toFixed(2))
             return Set_Price_Details({ Amount_Total, Sub_Total, Tax_Total, Discount_Total })
@@ -54,7 +54,7 @@ const NewInvoice = (props) => {
             Set_Product_Selected(Product_Selected.filter(Product => Product._id !== Product_Data._id))
         }
     }
-
+console.log(Product_Selected)
     const Save_Invoice = async (e) => {
         try {
             e.preventDefault()
@@ -69,6 +69,7 @@ const NewInvoice = (props) => {
             if (Product_Selected.length === 0) return alert("Please Add Product First."), Set_Loading(false)
 
             const Updated_Product_Selected = Product_Selected.map(({ _id, stock, ...Product }) => ({ ...Product, id: _id }))
+            console.log(Updated_Product_Selected)
             const Invoice_ACK = await fetch("http://localhost:3100/Api/Create_Invoice/" + Customer_Details._id, {
                 method: "post",
                 body: JSON.stringify({ Ordered_Items: Updated_Product_Selected }),

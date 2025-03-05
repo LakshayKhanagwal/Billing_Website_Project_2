@@ -326,15 +326,19 @@ Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response)
         let Total_Amount = 0
 
         Ordered_Items.map(item => {
-            const tax = ((item.price * item.tax) / 100) * item.quantity.toFixed(2)
-            const discount = ((item.price * item.discount) / 100) * item.quantity.toFixed(2)
-            item.subtotal = (item.price * item.quantity) + tax - discount.toFixed(2)
-            const profit = item.subtotal - tax - discount - (item.rate * item.quantity).toFixed(2)
+            const discount = parseFloat((((item.price * item.discount) / 100) * item.quantity).toFixed(2))
+            const tax = parseFloat(((((item.price - (item.price * item.discount / 100)) * item.tax) / 100) * item.quantity).toFixed(2))
+            item.subtotal = parseFloat(((item.price * item.quantity) + tax - discount).toFixed(2))
+            const profit = parseFloat((item.subtotal - tax - (item.rate * item.quantity)).toFixed(2))
 
             Total_Tax += tax
             Total_Discount += discount
             Total_Amount += item.subtotal
             Total_Profit += profit
+        })
+        Ordered_Items.map(async item => {
+            const items_one = await Product.findOne({ _id: item.id })
+            await Product.updateOne({ _id: item.id }, { $set: { stock: items_one.stock - item.quantity } })
         })
 
         const Orders_ACK = OrderedItems.insertMany(Ordered_Items)
@@ -345,6 +349,7 @@ Routes.post("/Create_Invoice/:id", Token_Verification, async (request, response)
         const User_id = request.user._id
         Complete_Invoice = await Invoice.create({ InvoiceNo: Invoice_Number, OrderItems: All_ID, TotalAmount: Total_Amount, TotalTax: Total_Tax, TotalDiscount: Total_Discount, TotalProfit: Total_Profit, Subtotal: Total_Amount, customerId: id, shopkeeperId: User_id })
         const Final_Ordered_Items = await OrderedItems.find({ _id: { $in: All_ID } })
+        await Customer.updateOne({ _id: id }, { $set: { balance: Existing_Customer.balance + Total_Amount } })
         return Resopnse_Handler(response, 202, "Invoice Generated Successfully.", { Final_Ordered_Items, Complete_Invoice })
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
@@ -359,7 +364,7 @@ Routes.post("/Data_For_Invoice_PDF", Token_Verification, async (request, respons
         const Customer_Data = await Customer.findOne({ _id: id }).select("name phone email address balance -_id")
         if (!Customer_Data) return Resopnse_Handler(response, 404, "Invaild Customer.")
 
-        return Resopnse_Handler(response, 202, "Data Fetched Successfully..", { Shopkeeper,Customer_Data })
+        return Resopnse_Handler(response, 202, "Data Fetched Successfully..", { Shopkeeper, Customer_Data })
     } catch (error) {
         return Resopnse_Handler(response, 500, "Internal Server Error", null, error)
     }
